@@ -142,7 +142,10 @@
         Пароль
         <span id="pass-strength-label" class="pass-strength-label" style="font-size:11px;font-weight:400;letter-spacing:0;"></span>
       </label>
-      <input class="form-input" type="password" id="inp-pass" placeholder="Мінімум 8 символів" oninput="validatePass(this)">
+      <div class="pass-wrap">
+        <input class="form-input" type="password" id="inp-pass" placeholder="Мінімум 8 символів" oninput="validatePass(this)">
+        <button class="eye-btn" type="button" onclick="togglePass('inp-pass',this)" tabindex="-1">👁</button>
+      </div>
       <div class="pass-strength" id="pass-bars">
         <div class="pass-bar" id="bar1"></div>
         <div class="pass-bar" id="bar2"></div>
@@ -202,9 +205,9 @@
         <button class="eye-btn" type="button" onclick="togglePass('login-pass',this)">👁</button>
       </div>
     </div>
-    <button class="submit-btn" id="login-submit-btn" onclick="handleLogin()">Увійти →</button>
+    <button class="submit-btn" id="login-submit-btn" onclick="window.doLogin ? window.doLogin() : handleLogin()">Увійти →</button>
     <div style="text-align:right;margin-top:8px;">
-      <a href="#" onclick="handleForgotPassword()" style="font-size:12px;color:var(--text-dim);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--mint)'" onmouseout="this.style.color='var(--text-dim)'">Забув пароль?</a>
+      <a href="#" onclick="handleForgotPassword()" style="font-size:12px;color:var(--mint);text-decoration:none;opacity:.8;transition:opacity .2s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='.8'">Забув пароль?</a>
     </div>
     <div class="form-divider" style="margin-top:14px;">або</div>
     <div style="text-align:center;font-size:13px;color:var(--text-muted);">Немає акаунту? <a href="#" style="color:var(--mint);text-decoration:none;" onclick="switchToRegister()">Зареєструватись →</a></div>
@@ -436,16 +439,13 @@ function switchToRegister(){
 
 if(window.location.hash==='#login') switchToLogin();
 
-// Bridge — викликає Firebase doLogin або fallback
+// Bridge
 function handleLogin() {
   if (typeof window.doLogin === 'function') {
     window.doLogin();
   } else {
-    // Firebase ще не завантажився — показати помилку
-    setBubble('Зачекай секунду і спробуй ще раз...');
-    setTimeout(() => {
-      if (typeof window.doLogin === 'function') window.doLogin();
-    }, 1500);
+    setBubble('Зачекай секунду...');
+    setTimeout(() => window.doLogin && window.doLogin(), 800);
   }
 }
 
@@ -594,6 +594,7 @@ window.doLogin = async function() {
 };
 
 window.handleLogin = window.doLogin;
+window.handleForgotPassword = window.handleForgotPassword || function(){};
 
 window.handleForgotPassword = async function() {
   const emailEl = document.querySelector('#login-form .form-input[type="email"]');
