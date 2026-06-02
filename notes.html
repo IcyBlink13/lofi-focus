@@ -232,8 +232,8 @@ window.addEventListener('load', () => {
   // Підтягнути нотатки з кімнати практики
   importPracticeNotes(user);
 
-  // Префільтр по інструменту користувача
-  document.getElementById('filter-inst').value = user.instrument || 'all';
+  // Показувати всі нотатки за замовчуванням
+  document.getElementById('filter-inst').value = 'all';
 
   renderNotes();
 });

@@ -75,7 +75,7 @@ const LESSONS = {
         'Відпрацюй удар по бас-барабану: 1 і 3 долі.',
         'Додай малий барабан: 2 і 4 долі.',
         'Правою рукою грай хай-хет на кожну долю.',
-        'З'єднай всі три разом — базовий рок-ритм.',
+        'Зєднай всі три разом — базовий рок-ритм.',
         'Зіграй 2 хвилини без зупинки рівно.',
       ],
     },
@@ -109,7 +109,7 @@ const LESSONS = {
         'Ліва нога — хай-хет на 2 і 4.',
         'Права нога — спонтанні удари по бас-барабану.',
         'Мала рука — компінг по малому барабану.',
-        'З'єднай всі чотири кінцівки разом.',
+        'Зєднай всі чотири кінцівки разом.',
         'Зіграй 4-тактовий джазовий фрагмент.',
       ],
     },
@@ -312,7 +312,7 @@ function loadVideo() {
 function openYouTube() {
   if (!state.lesson) return;
   const wrap = document.getElementById('video-wrap');
-  wrap.innerHTML = \`
+  wrap.innerHTML = `
     <div class="video-placeholder" style="gap:16px;">
       <div style="font-size:36px;">🎬</div>
       <div style="font-size:14px;color:var(--text-main);font-weight:500;">\${state.lesson.title}</div>
@@ -322,7 +322,7 @@ function openYouTube() {
          style="background:var(--mint);color:var(--bg-deep);font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
         ▶ Відкрити відео
       </a>
-    </div>\`;
+    </div>`;
 }
 
 // ── Вибір тривалості ──
