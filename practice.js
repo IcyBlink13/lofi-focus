@@ -61,6 +61,59 @@ const LESSONS = {
       ],
     },
   },
+  drums: {
+    beginner: {
+      title: 'Барабани — Основний ритм 4/4',
+      videoId: 'KDvfBCCa2kA',
+      chords: [
+        { name: 'Kick', fingers: ['●','○','○','○'], note: 'Бас-барабан (нога)' },
+        { name: 'Snare', fingers: ['○','●','○','●'], note: 'Малий барабан' },
+        { name: 'Hi-hat', fingers: ['●','●','●','●'], note: 'Хай-хет (рука)' },
+      ],
+      steps: [
+        'Постав ноги на педалі. Права — бас-барабан, ліва — хай-хет.',
+        'Відпрацюй удар по бас-барабану: 1 і 3 долі.',
+        'Додай малий барабан: 2 і 4 долі.',
+        'Правою рукою грай хай-хет на кожну долю.',
+        'З'єднай всі три разом — базовий рок-ритм.',
+        'Зіграй 2 хвилини без зупинки рівно.',
+      ],
+    },
+    middle: {
+      title: 'Барабани — Синкопований ритм',
+      videoId: 'KDvfBCCa2kA',
+      chords: [
+        { name: 'Kick', fingers: ['●','○','●','○','●'], note: 'Подвійний удар' },
+        { name: 'Snare', fingers: ['○','●','○','●','○'], note: 'З акцентом' },
+        { name: 'Ride', fingers: ['●','●','●','●','●'], note: 'Райд замість хай-хету' },
+      ],
+      steps: [
+        'Розігрів — базовий ритм 4/4 на 60 BPM.',
+        'Додай синкопу: удар між 2 і 3 долею.',
+        'Відпрацюй подвійний удар ногою.',
+        'Замін хай-хет на райд.',
+        'Зіграй весь ритм на 80 BPM.',
+        'Додай простий філ на 4-й долі.',
+      ],
+    },
+    advanced: {
+      title: 'Барабани — Джазові ритми',
+      videoId: 'KDvfBCCa2kA',
+      chords: [
+        { name: 'Swing', fingers: ['●','○','●','●','○'], note: 'Свінг-патерн' },
+        { name: 'Brush', fingers: ['~','~','~','~'], note: 'Щітки по малому' },
+        { name: 'Ride', fingers: ['●','○','●','○'], note: 'Джаз на райді' },
+      ],
+      steps: [
+        'Свінг на райді: тріолі з акцентом на 1 і 3.',
+        'Ліва нога — хай-хет на 2 і 4.',
+        'Права нога — спонтанні удари по бас-барабану.',
+        'Мала рука — компінг по малому барабану.',
+        'З'єднай всі чотири кінцівки разом.',
+        'Зіграй 4-тактовий джазовий фрагмент.',
+      ],
+    },
+  },
   vocal: {
     beginner: {
       title: 'Вокал — Дихальні вправи',
@@ -152,9 +205,14 @@ window.addEventListener('load', () => {
 
   // Маскот
   const isKori = state.instrument === 'flute' || state.instrument === 'vocal';
-  const mascotSrc = isKori
-    ? (state.instrument === 'vocal' ? 'kori_mic.jpg' : 'kori_flute.jpg')
-    : 'kael_guide.png';
+  const mascotSrc = {
+    guitar:  'kael_guide.png',
+    piano:   'kori_piano.png',
+    drums: 'kael_guide.png',
+    violin:  'kael_guide.png',
+    flute:   'kori_flute.jpg',
+    vocal:   'kori_mic.jpg',
+  }[state.instrument] || 'kael_guide.png';
   document.getElementById('mascot-img').src         = mascotSrc;
   document.getElementById('finish-mascot').src      = mascotSrc;
   document.getElementById('mascot-img').onerror     = function(){ this.src = 'kael_guide.png'; };
@@ -382,19 +440,24 @@ function finishSession() {
   document.getElementById('finish-sub').textContent    =
     `Ти практикував ${mins} хвилин! Чудова робота — я пишаюся тобою 🎉`;
 
-  // Зберегти в localStorage
-  const raw = localStorage.getItem('lofi_user');
-  if (raw) {
-    const user = JSON.parse(raw);
-    user.totalMinutes   = (user.totalMinutes || 0) + mins;
-    user.lessonsCompleted = (user.lessonsCompleted || 0) + 1;
-    // Стрік — якщо ще не практикував сьогодні
-    const today = new Date().toDateString();
-    if (user.lastPracticeDate !== today) {
-      user.streak = (user.streak || 0) + 1;
-      user.lastPracticeDate = today;
+  // Зберегти в Firebase (+ localStorage як fallback)
+  try {
+    const { saveSessionResult } = await import('./firebase.js');
+    await saveSessionResult(mins);
+  } catch(e) {
+    // Fallback на localStorage якщо Firebase недоступний
+    const raw = localStorage.getItem('lofi_user');
+    if (raw) {
+      const user = JSON.parse(raw);
+      user.totalMinutes     = (user.totalMinutes     || 0) + mins;
+      user.lessonsCompleted = (user.lessonsCompleted || 0) + 1;
+      const today = new Date().toDateString();
+      if (user.lastPracticeDate !== today) {
+        user.streak = (user.streak || 0) + 1;
+        user.lastPracticeDate = today;
+      }
+      localStorage.setItem('lofi_user', JSON.stringify(user));
     }
-    localStorage.setItem('lofi_user', JSON.stringify(user));
   }
 
   // Показати overlay

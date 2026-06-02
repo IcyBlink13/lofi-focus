@@ -103,6 +103,7 @@
       <a href="home.html">Головна</a>
       <a href="lessons.html" class="active">Уроки</a>
       <a href="progress.html">Прогрес</a>
+      <a href="notes.html">Нотатки</a>
     </div>
     <div class="nav-avatar" id="nav-avatar">??</div>
   </nav>
@@ -121,7 +122,7 @@
       <button class="filter-btn active" data-inst="all" onclick="setFilter('inst','all',this)">Всі</button>
       <button class="filter-btn" data-inst="guitar"  onclick="setFilter('inst','guitar',this)">🎸 Гітара</button>
       <button class="filter-btn" data-inst="piano"   onclick="setFilter('inst','piano',this)">🎹 Фортепіано</button>
-      <button class="filter-btn" data-inst="ukulele" onclick="setFilter('inst','ukulele',this)">🪗 Укулеле</button>
+      <button class="filter-btn" data-inst="drums" onclick="setFilter('inst','drums',this)">🥁 Барабани</button>
       <button class="filter-btn" data-inst="violin"  onclick="setFilter('inst','violin',this)">🎻 Скрипка</button>
       <button class="filter-btn" data-inst="flute"   onclick="setFilter('inst','flute',this)">🎵 Флейта</button>
       <button class="filter-btn" data-inst="vocal"   onclick="setFilter('inst','vocal',this)">🎤 Вокал</button>
@@ -178,9 +179,9 @@ const ALL_LESSONS = [
   {id:'p-m-1', inst:'piano', lvl:'middle', title:'Дві руки разом — координація',             time:20, icon:'🎹', color:'#7aa2f7'},
   {id:'p-m-2', inst:'piano', lvl:'middle', title:'Педаль — де і коли використовувати',       time:18, icon:'🎹', color:'#7aa2f7'},
   // УКУЛЕЛЕ — ПОЧАТКІВЕЦЬ
-  {id:'u-b-1', inst:'ukulele', lvl:'beginner', title:'Налаштування укулеле — GCEA',          time:10, icon:'🪗', color:'#ff9e64'},
-  {id:'u-b-2', inst:'ukulele', lvl:'beginner', title:'Перші акорди — C, Am, F',              time:12, icon:'🪗', color:'#ff9e64'},
-  {id:'u-b-3', inst:'ukulele', lvl:'beginner', title:'Простий бій — перша пісня',            time:15, icon:'🪗', color:'#ff9e64'},
+  {id:'u-b-1', inst:'drums', lvl:'beginner', title:'Налаштування барабани — GCEA',          time:10, icon:'🥁', color:'#ff9e64'},
+  {id:'u-b-2', inst:'drums', lvl:'beginner', title:'Хват паличок та постановка рук',              time:12, icon:'🥁', color:'#ff9e64'},
+  {id:'u-b-3', inst:'drums', lvl:'beginner', title:'Базовий рок-ритм — перша пісня',            time:15, icon:'🥁', color:'#ff9e64'},
   // СКРИПКА — ПОЧАТКІВЕЦЬ
   {id:'v-b-1', inst:'violin', lvl:'beginner', title:'Постановка смичка і руки',              time:12, icon:'🎻', color:'#e0af68'},
   {id:'v-b-2', inst:'violin', lvl:'beginner', title:'Перші ноти — відкриті струни',          time:15, icon:'🎻', color:'#e0af68'},
@@ -202,7 +203,7 @@ const ALL_LESSONS = [
 ];
 
 const LEVEL_LABEL = { beginner:'Початківець', middle:'Середній', advanced:'Впевнений' };
-const INST_LABEL  = { guitar:'Гітара', piano:'Фортепіано', ukulele:'Укулеле', violin:'Скрипка', flute:'Флейта', vocal:'Вокал' };
+const INST_LABEL  = { guitar:'Гітара', piano:'Фортепіано', drums:'Барабани', violin:'Скрипка', flute:'Флейта', vocal:'Вокал' };
 
 // ── Стан фільтрів ──
 const filters = { inst: 'all', lvl: 'all' };

@@ -1,299 +1,455 @@
 // ═══════════════════════════════════════════════
-//  lo.fi·focus — home.js
-//  Вся логіка головної сторінки (home.html)
+//  lo.fi·focus — home.js  (повна версія)
 // ═══════════════════════════════════════════════
 
-// ── Дані по інструментах ──
+// ── Інструменти ──
 const INST_MAP = {
-  guitar:  { label: 'Каель · гітара',  mascot: 'kael_guitar.jpg', badge: '🎸 Гітара',      lastLesson: 'Гітара — Перехід Am → E' },
-  piano:   { label: 'Каель · ваш гід', mascot: 'kael_guide.png',  badge: '🎹 Фортепіано',  lastLesson: 'Фортепіано — До мажор' },
-  ukulele: { label: 'Каель · ваш гід', mascot: 'kael_guide.png',  badge: '🪗 Укулеле',     lastLesson: 'Укулеле — Перший акорд C' },
-  violin:  { label: 'Каель · ваш гід', mascot: 'kael_guide.png',  badge: '🎻 Скрипка',     lastLesson: 'Скрипка — Постановка смичка' },
-  flute:   { label: 'Корі · флейта',   mascot: 'kori_flute.jpg',  badge: '🎵 Флейта',      lastLesson: 'Флейта — Перші ноти' },
-  vocal:   { label: 'Корі · вокал',    mascot: 'kori_mic.jpg',    badge: '🎤 Вокал',       lastLesson: 'Вокал — Дихальні вправи' },
+  guitar:  { label:'Каель · гітара',  mascot:'kael_guitar.jpg', badge:'🎸 Гітара',     lastLesson:'Гітара — Перехід Am → E' },
+  piano:   { label:'Корі · фортепіано', mascot:'kori_piano.png', badge:'🎹 Фортепіано', lastLesson:'Фортепіано — До мажор' },
+  drums: { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🥁 Барабани',    lastLesson:'Барабани — Перший акорд C' },
+  violin:  { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🎻 Скрипка',    lastLesson:'Скрипка — Постановка смичка' },
+  flute:   { label:'Корі · флейта',   mascot:'kori_flute.jpg',  badge:'🎵 Флейта',     lastLesson:'Флейта — Перші ноти' },
+  vocal:   { label:'Корі · вокал',    mascot:'kori_mic.jpg',    badge:'🎤 Вокал',      lastLesson:'Вокал — Дихальні вправи' },
 };
 
-// ── Фрази маскота (для повторного відвідувача) ──
+// ── Уроки для рекомендацій ──
+const LESSONS_DB = {
+  guitar: {
+    beginner: [
+      { title:'Як тримати гітару і ставити руки', time:10, lvl:'beginner' },
+      { title:'Перший акорд — Am',                time:12, lvl:'beginner' },
+      { title:'Перший акорд — E мажор',           time:12, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Баре на 1 ладу — акорд F',         time:20, lvl:'middle' },
+      { title:'Прогресія Am → F → C → G',         time:18, lvl:'middle' },
+      { title:'Fingerpicking — базовий паттерн',  time:20, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Легато — хаммер-он та пул-оф',     time:22, lvl:'advanced' },
+      { title:'Імпровізація в пентатоніці',        time:25, lvl:'advanced' },
+      { title:'Техніка арпеджіо',                 time:20, lvl:'advanced' },
+    ],
+  },
+  flute: {
+    beginner: [
+      { title:'Постановка амбушюра',              time:12, lvl:'beginner' },
+      { title:'Ноти Сі, Ля, Соль',               time:15, lvl:'beginner' },
+      { title:'Перша мелодія',                    time:18, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Вібрато на флейті',                time:20, lvl:'middle' },
+      { title:'Гами у другому октаві',            time:18, lvl:'middle' },
+      { title:'Артикуляція — легато та стакато',  time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Складні ритмічні паттерни',        time:25, lvl:'advanced' },
+      { title:'Сучасна техніка флейти',           time:22, lvl:'advanced' },
+      { title:'Мультифоніка',                     time:28, lvl:'advanced' },
+    ],
+  },
+  drums: {
+    beginner: [
+      { title:'Основний ритм 4/4 — перший крок', time:12, lvl:'beginner' },
+      { title:'Хват паличок та постановка рук',  time:10, lvl:'beginner' },
+      { title:'Бас-барабан + малий — базовий рок', time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Синкопований ритм',               time:18, lvl:'middle' },
+      { title:'Подвійний удар ногою',             time:20, lvl:'middle' },
+      { title:'Філи та заповнювачі',              time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Джазовий свінг-патерн',            time:22, lvl:'advanced' },
+      { title:'Поліритмія — 3 проти 4',           time:25, lvl:'advanced' },
+      { title:'Імпровізація соло на барабанах',   time:28, lvl:'advanced' },
+    ],
+  },
+  vocal: {
+    beginner: [
+      { title:'Дихання діафрагмою',               time:12, lvl:'beginner' },
+      { title:'Розспівка — терції та кварти',     time:15, lvl:'beginner' },
+      { title:'Резонатори голосу',                time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Мікрофонна техніка',               time:18, lvl:'middle' },
+      { title:'Розширення діапазону',             time:20, lvl:'middle' },
+      { title:'Робота з емоцією у співі',         time:18, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Мелізми та прикраси',              time:22, lvl:'advanced' },
+      { title:'Змішаний регістр',                 time:20, lvl:'advanced' },
+      { title:'Запис голосу — основи',            time:25, lvl:'advanced' },
+    ],
+  },
+  piano: {
+    beginner: [
+      { title:'Позиція рук і перші ноти',         time:12, lvl:'beginner' },
+      { title:'Гама До мажор',                    time:15, lvl:'beginner' },
+      { title:'Прості мелодії',                   time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Дві руки разом — координація',     time:20, lvl:'middle' },
+      { title:'Педаль — де і коли',               time:18, lvl:'middle' },
+      { title:'Акордові прогресії',               time:22, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Арпеджіо та інверсії акордів',     time:25, lvl:'advanced' },
+      { title:'Поліритмія',                       time:28, lvl:'advanced' },
+      { title:'Етюди Черні',                      time:30, lvl:'advanced' },
+    ],
+  },
+  drums: {
+    beginner: [
+      { title:'Налаштування барабани',             time:10, lvl:'beginner' },
+      { title:'Хват паличок та постановка рук',          time:12, lvl:'beginner' },
+      { title:'Базовий рок-ритм',                      time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Фінгерпікінг для барабани',         time:18, lvl:'middle' },
+      { title:'Баре на барабани',                  time:20, lvl:'middle' },
+      { title:'Робота з хай-хетом',                 time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Подвійні удари ногою',        time:22, lvl:'advanced' },
+      { title:'Фламенко-стиль для барабани',       time:25, lvl:'advanced' },
+      { title:'Імпровізація на барабанах',                 time:28, lvl:'advanced' },
+    ],
+  },
+  violin: {
+    beginner: [
+      { title:'Постановка смичка і руки',         time:12, lvl:'beginner' },
+      { title:'Перші ноти — відкриті струни',     time:15, lvl:'beginner' },
+      { title:'Гама Ре мажор',                    time:18, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Зміна позицій',                    time:20, lvl:'middle' },
+      { title:'Деташе та легато',                 time:18, lvl:'middle' },
+      { title:'Подвійні ноти',                    time:22, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Вібрато',                          time:25, lvl:'advanced' },
+      { title:'Позиція III',                      time:22, lvl:'advanced' },
+      { title:'Флажолети',                        time:28, lvl:'advanced' },
+    ],
+  },
+};
+
+// ── Факти дня ──
+const FACTS = [
+  { emoji:'🎸', text:'<strong>Гітара має близько 300 років</strong> сучасної форми. Але попередники існували ще в Стародавньому Єгипті — понад 3500 років тому.' },
+  { emoji:'🎵', text:'Людина <strong>починає реагувати на музику</strong> ще у животі матері — приблизно з 16-го тижня вагітності.' },
+  { emoji:'🧠', text:'Гра на музичному інструменті <strong>тренує обидві півкулі</strong> мозку одночасно — це одне з найскладніших завдань для нейронів.' },
+  { emoji:'🎹', text:'<strong>Фортепіано має 88 клавіш</strong>, але людський слух сприймає лише близько 10 октав — і піаніно покриває майже всі з них.' },
+  { emoji:'🔥', text:'<strong>10 000 годин</strong> практики — саме стільки потрібно, щоб стати справжнім експертом у будь-якій справі. 15 хвилин на день = 10 000 годин за 109 років. Але майстерність настає набагато раніше!' },
+  { emoji:'🎻', text:'Скрипки Страдіварі <strong>звучать краще після 300 років</strong>. Вчені досі не можуть точно пояснити чому — деревина, лак, форма — загадка.' },
+  { emoji:'🌊', text:'Музика у темпі <strong>60 ударів на хвилину</strong> синхронізується з серцевим ритмом і допомагає вчитися — саме тому lo-fi так добре підходить для навчання.' },
+  { emoji:'🎤', text:'Людський голос — <strong>єдиний музичний інструмент</strong>, який є у кожного від народження. І як будь-який інструмент — він потребує тренування.' },
+  { emoji:'🥁', text:'Барабани прийшло до Гаваїв з <strong>Португалії у 1879 році</strong>. Назва означає «стрибаюча блоха» — через швидкі рухи пальців.' },
+  { emoji:'🎵', text:'Практика <strong>у повільному темпі</strong> ефективніша за швидку. М\'язова пам\'ять формується точніше, коли мозок встигає обробити кожен рух.' },
+  { emoji:'🌙', text:'Lo-fi музика <strong>знижує рівень кортизолу</strong> (гормону стресу) і підвищує концентрацію — саме тому ми обрали такий стиль для платформи.' },
+  { emoji:'🎸', text:'Джимі Хендрікс був <strong>лівшею</strong> і грав на правій гітарі, перевернутій навиворіт. Це дало йому унікальний звук, який ніхто не міг відтворити.' },
+];
+
+// ── Фрази маскота ──
 const BUBBLES_KAEL = [
   'Не забудь розім\'яти пальці перед практикою 🤙',
   'Короткі сесії щодня — краще ніж годину раз на тиждень 🎵',
   'Пам\'ятаєш той важкий перехід? Сьогодні він дасться легше! 💪',
-  'Зроби хоча б 15 хвилин сьогодні — стрік не зламається! 🔥',
+  'Зроби хоча б 15 хвилин — стрік не зламається! 🔥',
 ];
 const BUBBLES_KORI = [
   'Привіт! Сьогодні пограємо разом? 🎵',
   'Дихання — основа всього. Не поспішай 🌬️',
-  'Флейта любить терпіння. Ти справляєшся! ✨',
   'Голос — теж інструмент. Розспівайся перед заняттям 🎤',
+  'Ти справляєшся! Кожен день кращий за попередній ✨',
 ];
-
-// ── Рекомендовані уроки для старту ──
-const FIRST_LESSONS = {
-  guitar: {
-    beginner: ['Як тримати інструмент', 'Перший акорд Am', 'Перший акорд E'],
-    middle:   ['Перехід Am → E', 'Ритмічний бій 4/4', 'Баре на 5 ладу'],
-    advanced: ['Техніка легато', 'Fingerpicking паттерни', 'Імпровізація в пентатоніці'],
-  },
-  piano: {
-    beginner: ['До мажор — позиція рук', 'Перша мелодія правою рукою', 'Ноти на клавіатурі'],
-    middle:   ['Акорди лівою рукою', 'Гами — До та Соль мажор', 'Прості твори для двох рук'],
-    advanced: ['Арпеджіо та розкладені акорди', 'Педаль — коли і як', 'Етюди Черні'],
-  },
-  ukulele: {
-    beginner: ['Налаштування укулеле', 'Перший акорд C', 'Простий бій'],
-    middle:   ['Акорди Am та F', 'Перша пісня', 'Фінгерпікінг'],
-    advanced: ['Баре на укулеле', 'Складні ритми', 'Транспозиція акордів'],
-  },
-  violin: {
-    beginner: ['Постановка смичка', 'Перші ноти — Ре та Ля', 'Як тримати скрипку'],
-    middle:   ['Зміна позицій', 'Деташе та легато', 'Гама Ре мажор'],
-    advanced: ['Вібрато', 'Подвійні ноти', 'Позиція III'],
-  },
-  flute: {
-    beginner: ['Постановка амбушюра', 'Перші звуки — нота Сі', 'Дихання флейтиста'],
-    middle:   ['Гама До мажор', 'Легато та стакато', 'Перша п\'єса'],
-    advanced: ['Вібрато', 'Складні ритми', 'Технічні вправи'],
-  },
-  vocal: {
-    beginner: ['Дихальні вправи', 'Розспівка — терції', 'Резонатори голосу'],
-    middle:   ['Робота з діапазоном', 'Мікрофонна техніка', 'Вокальна імпровізація'],
-    advanced: ['Мелізми та прикраси', 'Змішаний регістр', 'Запис голосу — основи'],
-  },
-};
-
-// ── Всі досягнення ──
-const ALL_ACH = [
-  { icon: '🌱', name: 'Перший крок',     desc: 'Завершено перший урок',     ok: u => (u.lessonsCompleted || 0) >= 1 },
-  { icon: '🔥', name: 'Тиждень поспіль', desc: '7 днів без перерви',         ok: u => (u.streak || 0) >= 7 },
-  { icon: '🎯', name: 'Фокус-режим',     desc: 'Концентрація >80% за сесію', ok: u => (u.lessonsCompleted || 0) >= 3 },
-  { icon: '🏆', name: '30 днів',         desc: '30 днів поспіль',            ok: u => (u.streak || 0) >= 30 },
+const BUBBLES_NEW = [
+  text => `Вітаю, <strong style="color:var(--mint)">${text}</strong>! 🎉 Починаємо разом — це буде круто!`,
+  text => `Привіт, <strong style="color:var(--mint)">${text}</strong>! Я буду поруч на кожному кроці 😄`,
 ];
 
 // ── Утиліти ──
 function getGreeting() {
   const h = new Date().getHours();
+  if (h < 6)  return 'Добраніч';
   if (h < 12) return 'Доброго ранку';
   if (h < 18) return 'Добрий день';
   return 'Добрий вечір';
 }
-
 function initials(name) {
-  return (name || '??')
-    .trim()
-    .split(' ')
-    .map(w => w[0])
-    .join('')
-    .toUpperCase()
-    .slice(0, 2);
+  return (name||'??').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
 }
-
 function levelLabel(lvl) {
-  return lvl === 'beginner' ? 'Початківець' : lvl === 'middle' ? 'Середній' : 'Впевнений';
+  return lvl==='beginner'?'Початківець':lvl==='middle'?'Середній':'Впевнений';
 }
-function levelIcon(lvl) {
-  return lvl === 'beginner' ? '🌱' : lvl === 'middle' ? '🎯' : '🔥';
+function levelCls(lvl) { return lvl||'beginner'; }
+function daysSince(isoDate) {
+  if (!isoDate) return 999;
+  return Math.floor((Date.now() - new Date(isoDate)) / 86400000);
+}
+function randomFrom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+
+// ── Факт дня ──
+let factIdx = parseInt(localStorage.getItem('lofi_fact_idx') || '0');
+function renderFact() {
+  const f = FACTS[factIdx % FACTS.length];
+  document.getElementById('fact-emoji').textContent = f.emoji;
+  document.getElementById('fact-text').innerHTML    = f.text;
+}
+function nextFact() {
+  factIdx = (factIdx + 1) % FACTS.length;
+  localStorage.setItem('lofi_fact_idx', factIdx);
+  const fc = document.getElementById('fact-card');
+  fc.style.opacity = '0';
+  fc.style.transition = 'opacity .3s';
+  setTimeout(() => { renderFact(); fc.style.opacity = '1'; }, 300);
 }
 
-// ── Рендер нового користувача ──
-function renderNewUser(user, inst, level) {
-  // Hero subtitle + streak
-  document.getElementById('hero-subtitle').textContent = 'Раді бачити тебе! Обери перший урок і починай 🎵';
-  document.getElementById('streak-row').innerHTML = `
-    <div class="streak-badge">
-      <span>🌱</span>
-      <span style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint)">День 1</span>
-      <span style="font-size:13px;color:var(--text-muted)">перший день — найважливіший</span>
-    </div>
-    <a href="practice.html" class="quick-btn">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
-      Почати перший урок
-    </a>`;
+// ── Ціль дня ──
+function renderGoal(user) {
+  const goalMins   = user.dailyGoal || 20;
+  const todayMins  = user.todayMinutes || 0;
+  const pct        = Math.min(Math.round(todayMins / goalMins * 100), 100);
+  const done       = todayMins >= goalMins;
+  const isEvening  = new Date().getHours() >= 19;
+  const streakRisk = !done && isEvening;
 
-  // Маскот bubble
-  const mascotName = (user.instrument === 'flute' || user.instrument === 'vocal') ? 'Корі' : 'Каель';
-  document.getElementById('mascot-bubble').innerHTML =
-    `Вітаю, <strong style="color:var(--mint)">${user.name}</strong>! 🎉<br>Я ${mascotName} — буду поруч на кожному кроці. Починаємо?`;
+  const barCls  = done ? 'done' : streakRisk ? 'warn' : '';
+  const meta    = done
+    ? `✓ Ціль виконана! Молодець 🎉`
+    : streakRisk
+      ? `⚠️ Вечір, а ціль ще не виконана — стрік під загрозою!`
+      : `${todayMins} з ${goalMins} хвилин сьогодні`;
 
-  // Статистика — порожній стан
-  document.getElementById('stats-section').innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card" style="border-style:dashed;">
-        <div class="stat-label">Хвилин практики</div>
-        <div class="stat-value" style="color:var(--text-dim)">0<span class="unit">хв</span></div>
-        <div class="stat-delta" style="color:var(--text-dim)">Ще попереду!</div>
+  document.getElementById('goal-section').innerHTML = `
+    <div class="goal-card" style="margin-bottom:24px;">
+      <div class="goal-icon">${done ? '🏆' : streakRisk ? '⚠️' : '🎯'}</div>
+      <div class="goal-info">
+        <div class="goal-label">Ціль дня</div>
+        <div class="goal-title">${done ? 'Сьогоднішня ціль виконана!' : `Зіграй ${goalMins} хвилин сьогодні`}</div>
+        <div class="goal-bar-wrap">
+          <div class="goal-bar ${barCls}" style="width:${pct}%"></div>
+        </div>
+        <div class="goal-meta">${meta}</div>
       </div>
-      <div class="stat-card" style="border-style:dashed;">
-        <div class="stat-label">Уроків пройдено</div>
-        <div class="stat-value" style="color:var(--text-dim)">0<span class="unit">з 48</span></div>
-        <div class="stat-delta" style="color:var(--text-dim)">Починай прямо зараз</div>
-      </div>
-      <div class="stat-card" style="border-style:dashed;">
-        <div class="stat-label">Рівень</div>
-        <div class="stat-value" style="font-size:20px;color:var(--text-dim)">${levelIcon(level)} ${levelLabel(level)}</div>
-        <div class="stat-delta" style="color:var(--text-dim)">Статистика з'явиться після занять</div>
+      <div class="goal-cta">
+        <a href="practice.html" class="quick-btn" style="font-size:13px;padding:8px 16px;">
+          ${done ? '▶ Ще одна сесія' : '▶ Почати'}
+        </a>
       </div>
     </div>`;
 
-  // Рекомендовані уроки
-  const lessons = (FIRST_LESSONS[user.instrument] || FIRST_LESSONS.guitar)[level] || FIRST_LESSONS.guitar.beginner;
-  document.getElementById('lessons-section').innerHTML = `
-    <div class="section-header">
-      <div class="section-title">Рекомендовані уроки для старту</div>
-      <a href="#" class="section-link">Весь каталог →</a>
-    </div>
-    <div class="lessons-grid">
-      ${lessons.map((title, i) => `
-        <a href="#" class="lesson-card" style="${i === 0 ? 'border-color:rgba(94,231,191,0.35);' : ''}">
-          ${i === 0 ? '<div style="font-size:10px;color:var(--mint);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">⭐ З цього починай</div>' : ''}
-          <div class="lesson-instrument">${inst.badge}</div>
-          <div class="lesson-title">${title}</div>
-          <div class="lesson-meta">
-            <span class="lesson-pill beginner">${levelLabel(level)}</span>
-            <span class="lesson-time">${10 + i * 4} хв</span>
+  // Маскот реагує на ризик стріку
+  if (streakRisk) {
+    setTimeout(() => {
+      setBubble('Стрік під загрозою! Ще є час — навіть 5 хвилин рятують 🔥');
+    }, 2000);
+  }
+}
+
+// ── Повтори ──
+function renderRepeats(user, inst) {
+  const container = document.getElementById('repeat-list');
+  const completedLessons = user.completedLessons || [];
+
+  // Якщо немає пройдених — показати заглушку
+  if (completedLessons.length === 0) {
+    container.innerHTML = `<div class="repeat-empty">
+      Пройди кілька уроків — і тут з'являться нагадування повторити їх 🌱
+    </div>`;
+    return;
+  }
+
+  // Знайти уроки що пройшли 3+ дні тому
+  const toRepeat = completedLessons
+    .filter(l => daysSince(l.completedAt) >= 3)
+    .slice(0, 3);
+
+  if (toRepeat.length === 0) {
+    container.innerHTML = `<div class="repeat-empty">
+      Все свіже! Повторення з'являться через кілька днів після уроку 👍
+    </div>`;
+    return;
+  }
+
+  container.innerHTML = toRepeat.map(l => {
+    const days = daysSince(l.completedAt);
+    const urgent = days >= 7;
+    return `
+      <div class="repeat-item">
+        <div class="repeat-icon">${inst.badge.split(' ')[0]}</div>
+        <div class="repeat-info">
+          <div class="repeat-title">${l.title}</div>
+          <div class="repeat-sub ${urgent ? 'urgent' : ''}">
+            ${urgent ? `⚠️ ${days} днів без повторення` : `${days} дні тому`}
           </div>
-        </a>`).join('')}
-    </div>`;
-
-  // Досягнення — заблоковано
-  document.getElementById('achievements-section').innerHTML = `
-    <div class="section-header"><div class="section-title">Досягнення</div></div>
-    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:20px 22px;margin-bottom:36px;display:flex;align-items:center;gap:14px;">
-      <span style="font-size:28px;">🔒</span>
-      <div>
-        <div style="font-size:14px;font-weight:500;color:var(--text-main);margin-bottom:4px;">Досягнення поки заблоковані</div>
-        <div style="font-size:12px;color:var(--text-dim);">Пройди перший урок — і перше досягнення вже твоє 🌱</div>
-      </div>
-    </div>`;
+        </div>
+        <a href="practice.html" class="repeat-btn">Повторити</a>
+      </div>`;
+  }).join('');
 }
 
-// ── Рендер повторного відвідувача ──
-function renderReturningUser(user, inst, level) {
-  // Hero
-  document.getElementById('last-lesson').textContent = inst.lastLesson;
-  const streakEl = document.getElementById('streak-num');
-  if (streakEl) streakEl.textContent = user.streak || 0;
+// ── Розклад тижня ──
+function renderWeek(user) {
+  const days    = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+  const today   = new Date().getDay(); // 0=Нд
+  const todayIdx = today === 0 ? 6 : today - 1; // 0=Пн
+  const weekData = user.weekActivity || Array(7).fill(0); // хвилин per day
 
-  // Статистика
-  document.getElementById('stats-section').innerHTML = `
-    <div class="stats-row">
-      <div class="stat-card">
-        <div class="stat-label">Хвилин практики</div>
-        <div class="stat-value">${user.totalMinutes || 0}<span class="unit">хв</span></div>
-        <div class="stat-delta">↑ цього тижня</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Уроків пройдено</div>
-        <div class="stat-value">${user.lessonsCompleted || 0}<span class="unit">з 48</span></div>
-        <div class="stat-delta">Продовжуй!</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Рівень</div>
-        <div class="stat-value" style="font-size:20px;">${levelIcon(level)} <span class="unit">${levelLabel(level)}</span></div>
-        <div class="stat-delta">↑ росте!</div>
-      </div>
-    </div>`;
+  let doneDays = 0;
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = days.map((d, i) => {
+    const mins    = weekData[i] || 0;
+    const isPast  = i < todayIdx;
+    const isToday = i === todayIdx;
+    const isFuture = i > todayIdx;
+    const hasPractice = mins > 0;
+    const missed  = isPast && !hasPractice;
 
-  // Уроки
-  document.getElementById('lessons-section').innerHTML = `
-    <div class="section-header">
-      <div class="section-title">Нещодавні уроки</div>
-      <a href="#" class="section-link">Весь каталог →</a>
-    </div>
-    <div class="lessons-grid">
-      <a href="practice.html" class="lesson-card done">
-        <div class="lesson-instrument">${inst.badge}</div>
-        <div class="lesson-title">${inst.lastLesson}</div>
-        <div class="lesson-meta"><span class="lesson-pill beginner">Завершено</span><span class="lesson-time">12 хв</span></div>
-      </a>
-      <a href="#" class="lesson-card">
-        <div class="lesson-instrument">${inst.badge}</div>
-        <div class="lesson-title">Наступний урок чекає тебе</div>
-        <div class="lesson-meta"><span class="lesson-pill medium">Продовження</span><span class="lesson-time">15 хв</span></div>
-      </a>
-      <a href="#" class="lesson-card" style="opacity:.5;pointer-events:none;">
-        <div class="lesson-instrument">${inst.badge}</div>
-        <div class="lesson-title">Буде розблоковано після попереднього</div>
-        <div class="lesson-meta"><span class="lesson-pill">Заблоковано</span><span class="lesson-time">18 хв</span></div>
-      </a>
-    </div>`;
+    if (hasPractice) doneDays++;
 
-  // Досягнення
-  const unlocked = ALL_ACH.filter(a => a.ok(user));
-  const locked   = ALL_ACH.filter(a => !a.ok(user));
-  const cards = [...unlocked, ...locked].map(a => `
-    <div class="ach-card${a.ok(user) ? '' : ' locked'}">
-      <div class="ach-icon">${a.icon}</div>
-      <div class="ach-info">
-        <div class="ach-name">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-      </div>
-    </div>`).join('');
-  document.getElementById('achievements-section').innerHTML = `
-    <div class="section-header"><div class="section-title">Досягнення</div></div>
-    <div class="achievements-row" style="margin-bottom:36px;">${cards}</div>`;
+    let cls = '';
+    if (isToday)          cls = hasPractice ? 'today done' : 'today';
+    else if (hasPractice) cls = 'done';
+    else if (missed)      cls = 'missed';
+    else                  cls = 'future';
 
-  // Bubble rotation
-  const isKori = user.instrument === 'flute' || user.instrument === 'vocal';
-  const bubbles = isKori ? BUBBLES_KORI : BUBBLES_KAEL;
-  let pi = 0;
-  const bel = document.getElementById('mascot-bubble');
-  bel.innerHTML = `${isKori ? 'Привіт' : 'Привіт'}, <strong style="color:var(--mint)">${user.name}</strong>! ${bubbles[0]}`;
-  setInterval(() => {
-    pi = (pi + 1) % bubbles.length;
-    bel.style.opacity = '0';
-    setTimeout(() => { bel.innerHTML = bubbles[pi]; bel.style.opacity = '1'; }, 400);
-  }, 5000);
+    return `
+      <div class="week-day">
+        <div class="week-day-label">${d}</div>
+        <div class="week-dot ${cls}">${hasPractice ? '✓' : isToday ? '·' : ''}</div>
+        <div class="week-minutes">${mins > 0 ? mins+'хв' : ''}</div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('week-summary').textContent = `${doneDays} з 7 днів`;
 }
 
-// ── Головна ініціалізація ──
+// ── Уроки ──
+function renderLessons(user, inst) {
+  const instrument = user.instrument || 'guitar';
+  const level      = user.level      || 'beginner';
+  const isNew      = !user.lessonsCompleted || user.lessonsCompleted === 0;
+  const pool       = (LESSONS_DB[instrument] || LESSONS_DB.guitar)[level] || [];
+  const lessons    = pool.slice(0, 3);
+
+  document.getElementById('lessons-section').innerHTML = lessons.map((l, i) => `
+    <a href="practice.html" class="lesson-card${isNew && i===0 ? '' : ''}">
+      ${isNew && i === 0 ? '<div style="font-size:10px;color:var(--mint);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">⭐ Починай звідси</div>' : ''}
+      <div class="lesson-inst">${inst.badge}</div>
+      <div class="lesson-title">${l.title}</div>
+      <div class="lesson-meta">
+        <span class="lesson-pill ${levelCls(l.lvl)}">${levelLabel(l.lvl)}</span>
+        <span class="lesson-time">⏱ ${l.time} хв</span>
+      </div>
+    </a>`).join('');
+}
+
+// ── Heatmap ──
+function renderHeatmap(user) {
+  const isNew = !user.lessonsCompleted || user.lessonsCompleted === 0;
+  const grid  = document.getElementById('heatmap');
+  const lvls  = ['','l1','l2','l3','l4'];
+  const pat   = isNew
+    ? Array(70).fill(0)
+    : [0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
+
+  const sessions = pat.filter(v=>v>0).length;
+  document.getElementById('hm-label').textContent = isNew ? 'Ще немає активності' : `${sessions} сесій`;
+
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('div');
+    c.className = 'hm-cell' + (pat[i] ? ' '+lvls[pat[i]] : '');
+    grid.appendChild(c);
+  }
+}
+
+// ── Bubble ──
+function setBubble(html) {
+  const b = document.getElementById('mascot-bubble');
+  b.style.opacity = '0';
+  b.style.transition = 'opacity .4s';
+  setTimeout(() => { b.innerHTML = html; b.style.opacity = '1'; }, 350);
+}
+
+// ── INIT ──
 window.addEventListener('load', () => {
-  // Перевірка авторизації
   const raw = localStorage.getItem('lofi_user');
   if (!raw) { window.location.href = 'index.html'; return; }
 
   const user   = JSON.parse(raw);
   const inst   = INST_MAP[user.instrument] || INST_MAP.guitar;
-  const level  = user.level || 'beginner';
   const isNew  = !user.lessonsCompleted || user.lessonsCompleted === 0;
   const name   = (user.name && user.name.trim()) || 'Учень';
+  const isKori = ['flute','vocal','piano'].includes(user.instrument);
 
-  // Привітання
-  document.getElementById('hero-greeting').textContent = getGreeting();
-  document.getElementById('hero-name').textContent = name;
+  // Greeting
+  document.getElementById('hero-greeting').textContent       = getGreeting();
+  document.getElementById('hero-name').textContent           = name;
+  document.getElementById('nav-inst-badge').textContent      = inst.badge;
+  document.getElementById('nav-initials').textContent        = initials(name);
+  document.getElementById('mascot-img').src                  = inst.mascot;
+  document.getElementById('mascot-name-tag').textContent     = inst.label;
+  document.getElementById('kael-idle-img').src               = inst.mascot;
+  document.getElementById('mascot-img').onerror              = function(){ this.src='kael_guide.png'; };
+  document.getElementById('kael-idle-img').onerror           = function(){ this.src='kael_guide.png'; };
 
-  // Навбар
-  document.getElementById('nav-inst-badge').textContent = inst.badge;
-  document.getElementById('nav-initials').textContent   = initials(name);
-
-  // Маскот (панель + кут)
-  document.getElementById('mascot-img').src          = inst.mascot;
-  document.getElementById('mascot-name-tag').textContent = inst.label;
-  document.getElementById('kael-idle-img').src       = inst.mascot;
-  // Fallback якщо файл не знайдено
-  document.getElementById('mascot-img').onerror      = function(){ this.src = 'kael_guide.png'; };
-  document.getElementById('kael-idle-img').onerror   = function(){ this.src = 'kael_guide.png'; };
-
-  // Рендер залежно від стану
+  // Hero subtitle + streak
   if (isNew) {
-    renderNewUser(user, inst, level);
+    document.getElementById('hero-subtitle').textContent = 'Раді бачити тебе! Обери перший урок і починай 🎵';
+    document.getElementById('streak-row').innerHTML = `
+      <div class="streak-badge">
+        <span>🌱</span>
+        <span style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);">День 1</span>
+        <span style="font-size:12px;color:var(--text-muted);">перший день — найважливіший</span>
+      </div>
+      <a href="practice.html" class="quick-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+        Почати перший урок
+      </a>`;
+    setBubble(BUBBLES_NEW[0](name));
   } else {
-    renderReturningUser(user, inst, level);
+    document.getElementById('hero-subtitle').innerHTML =
+      `Останній урок: <strong style="color:var(--text-main)">${inst.lastLesson}</strong><br>Продовжимо де зупинились?`;
+    document.getElementById('streak-num').textContent = user.streak || 0;
+
+    // Bubble rotation
+    const bubbles = isKori ? BUBBLES_KORI : BUBBLES_KAEL;
+    let pi = 0;
+    setBubble(bubbles[0]);
+    setInterval(() => {
+      pi = (pi+1) % bubbles.length;
+      setBubble(bubbles[pi]);
+    }, 6000);
   }
+
+  // Ціль дня
+  renderGoal(user);
+
+  // Повтори
+  renderRepeats(user, inst);
+
+  // Розклад тижня
+  renderWeek(user);
+
+  // Уроки
+  renderLessons(user, inst);
+
+  // Факт дня — новий факт щодня
+  const today = new Date().toDateString();
+  if (localStorage.getItem('lofi_fact_date') !== today) {
+    factIdx = Math.floor(Math.random() * FACTS.length);
+    localStorage.setItem('lofi_fact_idx',  factIdx);
+    localStorage.setItem('lofi_fact_date', today);
+  }
+  renderFact();
 
   // Heatmap
-  const grid = document.getElementById('heatmap');
-  const lvls = ['', 'l1', 'l2', 'l3', 'l4'];
-  const pat  = isNew
-    ? Array(70).fill(0)
-    : [0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
-  for (let i = 0; i < 70; i++) {
-    const c = document.createElement('div');
-    c.className = 'hm-cell' + (pat[i] ? ' ' + lvls[pat[i]] : '');
-    grid.appendChild(c);
-  }
+  renderHeatmap(user);
 });
 
-// ── Меню аватара (клік, не hover) ──
+// ── Меню ──
 function toggleMenu(e) {
   e.stopPropagation();
   document.getElementById('nav-menu').classList.toggle('open');
@@ -303,22 +459,23 @@ document.addEventListener('click', () => {
   if (m) m.classList.remove('open');
 });
 
-// ── Idle маскот у кутку ──
-const idlePhrases = [
-  'Натисни «Продовжити урок» — я чекаю! 🎸',
+// ── Idle маскот ──
+const IDLE_PHRASES = [
+  'Натисни «Почати» — я чекаю! 🎸',
   '15 хвилин щодня — і за місяць не впізнаєш себе 🎵',
   'Зіграй хоча б одну гаму — це вже практика! 🌱',
+  'Перевір нотатки з останньої практики 📝',
 ];
 let bubbleTimeout;
 function toggleIdleBubble() {
-  const idleBubble = document.getElementById('kael-idle-bubble');
-  if (idleBubble.classList.contains('show')) {
-    idleBubble.classList.remove('show');
+  const b = document.getElementById('kael-idle-bubble');
+  if (b.classList.contains('show')) {
+    b.classList.remove('show');
   } else {
-    idleBubble.innerHTML = idlePhrases[Math.floor(Math.random() * idlePhrases.length)];
-    idleBubble.classList.add('show');
+    b.innerHTML = randomFrom(IDLE_PHRASES);
+    b.classList.add('show');
     clearTimeout(bubbleTimeout);
-    bubbleTimeout = setTimeout(() => idleBubble.classList.remove('show'), 4500);
+    bubbleTimeout = setTimeout(() => b.classList.remove('show'), 4500);
   }
 }
 
@@ -326,5 +483,4 @@ function toggleIdleBubble() {
 function logout() {
   localStorage.removeItem('lofi_user');
   localStorage.removeItem('lofi_tour_done');
-  window.location.href = 'index.html';
 }

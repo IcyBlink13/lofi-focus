@@ -240,7 +240,7 @@
       <select class="setting-select" id="inst-select" onchange="changeInst(this.value)">
         <option value="guitar">🎸 Гітара</option>
         <option value="piano">🎹 Фортепіано</option>
-        <option value="ukulele">🪗 Укулеле</option>
+        <option value="drums">🥁 Барабани</option>
         <option value="violin">🎻 Скрипка</option>
         <option value="flute">🎵 Флейта</option>
         <option value="vocal">🎤 Вокал</option>
@@ -456,6 +456,99 @@ function logout(){
   localStorage.removeItem('lofi_tour_done');
   window.location.href='index.html';
 }
+</script>
+<script type="module">
+import { onAuthReady, changeUserPassword, changeUserEmail, updateUserProfile, logoutUser, saveSettings } from './firebase.js';
+
+onAuthReady((user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  localStorage.setItem('lofi_user', JSON.stringify(user));
+
+  document.getElementById('settings-sub').textContent = `Привіт, ${user.name||'учень'} — тут можна змінити все під себе`;
+  document.getElementById('current-name-desc').textContent  = 'Поточне: '  + (user.name  || '—');
+  document.getElementById('current-email-desc').textContent = 'Поточний: ' + (user.email || '—');
+  document.getElementById('inst-select').value = user.instrument || 'guitar';
+  document.getElementById('lvl-select').value  = user.level      || 'beginner';
+  document.getElementById('lang-select').value = localStorage.getItem('lofi_lang') || 'uk';
+
+  const theme = localStorage.getItem('lofi_theme') || 'dark';
+  applyTheme(theme, false);
+
+  const prefs = JSON.parse(localStorage.getItem('lofi_prefs') || '{}');
+  document.getElementById('toggle-anim').checked   = prefs.mascot_anim !== false;
+  document.getElementById('toggle-sound').checked  = prefs.timer_sound !== false;
+  document.getElementById('toggle-remind').checked = !!prefs.remind;
+});
+
+// Перевизначаємо функції щоб використовували Firebase
+window.changeName = async function() {
+  const val = document.getElementById('inp-name').value.trim();
+  if (val.length < 2) { toast('Введи коректне ім'я', false); return; }
+  try {
+    await updateUserProfile({ name: val });
+    document.getElementById('current-name-desc').textContent = 'Поточне: ' + val;
+    document.getElementById('inp-name').value = '';
+    toast('Ім'я змінено на «' + val + '»');
+  } catch (e) { toast('Помилка: ' + e.message, false); }
+};
+
+window.changeEmail = async function() {
+  const el  = document.getElementById('inp-email');
+  const old = document.getElementById('inp-pass-old').value;
+  if (!validateEmailField(el)) return;
+  if (!old) { toast('Введи поточний пароль для підтвердження', false); return; }
+  try {
+    await changeUserEmail(old, el.value.trim());
+    document.getElementById('current-email-desc').textContent = 'Поточний: ' + el.value.trim();
+    el.value = '';
+    document.getElementById('msg-email').textContent = '';
+    toast('Email змінено');
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') toast('Невірний пароль', false);
+    else toast('Помилка: ' + e.message, false);
+  }
+};
+
+window.changePass = async function() {
+  const oldVal = document.getElementById('inp-pass-old').value;
+  const newVal = document.getElementById('inp-pass-new').value;
+  const msg    = document.getElementById('msg-pass');
+  if (!oldVal) { toast('Введи поточний пароль', false); return; }
+  if (passScore(newVal) < 3 || newVal.length < 8) {
+    msg.className = 'field-msg err';
+    msg.textContent = 'Пароль надто слабкий';
+    return;
+  }
+  try {
+    await changeUserPassword(oldVal, newVal);
+    toast('Пароль оновлено ✓');
+    document.getElementById('inp-pass-old').value = '';
+    document.getElementById('inp-pass-new').value = '';
+    msg.textContent = '';
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') toast('Невірний поточний пароль', false);
+    else toast('Помилка: ' + e.message, false);
+  }
+};
+
+window.changeInst = async function(v) {
+  await updateUserProfile({ instrument: v });
+  toast('Інструмент змінено');
+};
+
+window.changeLevel = async function(v) {
+  await updateUserProfile({ level: v });
+  toast('Рівень змінено');
+};
+
+window.confirmReset = async function() {
+  if (!confirm('Скинути весь прогрес? Це незворотньо.')) return;
+  await updateUserProfile({ streak:0, totalMinutes:0, lessonsCompleted:0,
+    todayMinutes:0, weekActivity:[0,0,0,0,0,0,0], completedLessons:[] });
+  toast('Прогрес скинуто');
+};
+
+window.logout = function() { logoutUser(); };
 </script>
 </body>
 </html>
