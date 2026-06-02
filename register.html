@@ -203,7 +203,10 @@
       </div>
     </div>
     <button class="submit-btn" id="login-submit-btn" onclick="handleLogin()">Увійти →</button>
-    <div class="form-divider" style="margin-top:18px;">або</div>
+    <div style="text-align:right;margin-top:8px;">
+      <a href="#" onclick="handleForgotPassword()" style="font-size:12px;color:var(--text-dim);text-decoration:none;transition:color .2s;" onmouseover="this.style.color='var(--mint)'" onmouseout="this.style.color='var(--text-dim)'">Забув пароль?</a>
+    </div>
+    <div class="form-divider" style="margin-top:14px;">або</div>
     <div style="text-align:center;font-size:13px;color:var(--text-muted);">Немає акаунту? <a href="#" style="color:var(--mint);text-decoration:none;" onclick="switchToRegister()">Зареєструватись →</a></div>
   </div>
 </div>
@@ -214,7 +217,7 @@
 // ═══════════════════════════════════════
 const INST_DATA={
   guitar: {hint:'Відмінний вибір! Я — <strong style="color:var(--mint)">Каель</strong> — особисто проведу тебе через всі уроки гітари 🎸', mascot:'kael_guitar.jpg', label:'Каель · гітара'},
-  piano:  {hint:'Фортепіано — класика! Починаємо з базових акордів 🎹', mascot:'kael_guide.png', label:'Каель · ваш гід'},
+  piano:  {hint:'Фортепіано — класика! <strong style="color:var(--lavender)">Корі</strong> допоможе з першими кроками 🎹', mascot:'kori_piano.png', label:'Корі · фортепіано'},
   drums:{hint:'Барабани — ідеальний старт! Вже через тиждень зможеш грати пісні 🥁', mascot:'kael_guide.png', label:'Каель · ваш гід'},
   violin: {hint:'Скрипка вимагає терпіння — але результат того вартий! 🎻', mascot:'kael_guide.png', label:'Каель · ваш гід'},
   flute:  {hint:'Флейта? Тоді твоїм гідом буде <strong style="color:var(--lavender)">Корі</strong>! Вона вже чекає 🎵', mascot:'kori_flute.jpg', label:'Корі · флейта'},
@@ -501,6 +504,25 @@ window.doRegister = async function() {
     if (err.code === 'auth/weak-password')        msg = 'Пароль надто слабкий.';
     if (err.code === 'auth/invalid-email')        msg = 'Некоректний email.';
     setBubble(msg);
+  }
+};
+
+window.handleForgotPassword = async function() {
+  const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js');
+  const { auth } = await import('./firebase.js');
+  const emailEl = document.querySelector('#login-form .form-input[type="email"]');
+  const email = emailEl ? emailEl.value.trim() : '';
+  if (!email) {
+    setBubble('Введи свій email вище — надішлемо посилання для скидання пароля 📧');
+    emailEl && emailEl.focus();
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    setBubble(`✓ Лист надіслано на <strong style="color:var(--mint)">${email}</strong>!<br>Перевір пошту і спам 📧`);
+  } catch(e) {
+    if (e.code === 'auth/user-not-found') setBubble('Акаунт з таким email не знайдено');
+    else setBubble('Помилка: ' + e.message);
   }
 };
 

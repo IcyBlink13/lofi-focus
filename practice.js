@@ -477,24 +477,18 @@ function finishSession() {
   document.getElementById('finish-sub').textContent    =
     `Ти практикував ${mins} хвилин! Чудова робота — я пишаюся тобою 🎉`;
 
-  // Зберегти в Firebase (+ localStorage як fallback)
-  try {
-    const { saveSessionResult } = await import('./firebase.js');
-    await saveSessionResult(mins);
-  } catch(e) {
-    // Fallback на localStorage якщо Firebase недоступний
-    const raw = localStorage.getItem('lofi_user');
-    if (raw) {
-      const user = JSON.parse(raw);
-      user.totalMinutes     = (user.totalMinutes     || 0) + mins;
-      user.lessonsCompleted = (user.lessonsCompleted || 0) + 1;
-      const today = new Date().toDateString();
-      if (user.lastPracticeDate !== today) {
-        user.streak = (user.streak || 0) + 1;
-        user.lastPracticeDate = today;
-      }
-      localStorage.setItem('lofi_user', JSON.stringify(user));
+  // Зберегти в localStorage
+  const raw = localStorage.getItem('lofi_user');
+  if (raw) {
+    const user = JSON.parse(raw);
+    user.totalMinutes     = (user.totalMinutes     || 0) + mins;
+    user.lessonsCompleted = (user.lessonsCompleted || 0) + 1;
+    const today = new Date().toDateString();
+    if (user.lastPracticeDate !== today) {
+      user.streak = (user.streak || 0) + 1;
+      user.lastPracticeDate = today;
     }
+    localStorage.setItem('lofi_user', JSON.stringify(user));
   }
 
   // Показати overlay
