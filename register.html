@@ -462,90 +462,148 @@ function togglePass(id, btn) {
 }
 </script>
 
-<script type="module">
-import { registerUser, loginUser } from './firebase.js';
+<script>
+// ── Firebase Auth via REST API (без ES modules) ──
+const FB_API_KEY = "AIzaSyC-jDfdJ_lrdWM3zvUJcEluTBtGVEa038c";
+const FB_PROJECT = "lofi-focus-ef01c";
 
-// Перевизначаємо doRegister і doLogin щоб використовувати Firebase
+async function firebaseRequest(endpoint, body) {
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:${endpoint}?key=${FB_API_KEY}`,
+    { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) }
+  );
+  const data = await res.json();
+  if (data.error) throw { code: data.error.message, message: data.error.message };
+  return data;
+}
+
+async function firestoreSet(uid, idToken, userData) {
+  await fetch(
+    `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents/users/${uid}`,
+    {
+      method: 'PATCH',
+      headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${idToken}` },
+      body: JSON.stringify({
+        fields: Object.fromEntries(
+          Object.entries(userData).map(([k,v]) => [k, typeof v === 'number' ? {integerValue: v} : typeof v === 'boolean' ? {booleanValue: v} : Array.isArray(v) ? {arrayValue:{values:v.map(i=>({integerValue:i}))}} : v === null ? {nullValue:null} : {stringValue: String(v)}])
+        )
+      })
+    }
+  );
+}
 
 window.doRegister = async function() {
   const name  = document.getElementById('inp-name').value.trim();
   const email = document.getElementById('inp-email').value.trim();
   const pass  = document.getElementById('inp-pass').value;
   let ok = true;
-
-  [document.getElementById('inp-name'),
-   document.getElementById('inp-email'),
-   document.getElementById('inp-pass')].forEach(el => {
+  ['inp-name','inp-email','inp-pass'].forEach(id => {
+    const el = document.getElementById(id);
     el.classList.remove('is-error');
     if (!el.value.trim()) { el.classList.add('is-error'); ok = false; }
   });
-  if (!ok) {
-    setBubble('Схоже, є помилки у формі — перевір виділені поля 👀');
-    return;
-  }
+  if (!ok) { setBubble('Заповни всі поля 👀'); return; }
 
   const btn = document.getElementById('submit-btn');
-  btn.textContent = 'Створюємо профіль...';
-  btn.disabled = true;
+  btn.textContent = 'Створюємо...'; btn.disabled = true;
 
   try {
-    await registerUser({
-      name, email, password: pass,
+    const data = await firebaseRequest('signUp', { email, password: pass, returnSecureToken: true });
+    const uid     = data.localId;
+    const idToken = data.idToken;
+
+    const user = {
+      uid, name, email,
       instrument: selectedInst || 'guitar',
-      level:      selectedLevel || 'beginner',
-    });
-    localStorage.setItem('lofi_tour_done', '1');
-    window.location.href = 'home.html';
-  } catch (err) {
-    btn.textContent = 'Створити профіль →';
-    btn.disabled = false;
-    let msg = 'Помилка реєстрації. Спробуй ще раз.';
-    if (err.code === 'auth/email-already-in-use') msg = 'Цей email вже зареєстрований. Спробуй увійти.';
-    if (err.code === 'auth/weak-password')        msg = 'Пароль надто слабкий.';
-    if (err.code === 'auth/invalid-email')        msg = 'Некоректний email.';
-    setBubble(msg);
-  }
-};
+      level: selectedLevel || 'beginner',
+      streak: 0, totalMinutes: 0, lessonsCompleted: 0,
+      todayMinutes: 0, dailyGoal: 20,
+      weekActivity: [0,0,0,0,0,0,0],
+      completedLessons: [],
+      joinedAt: new Date().toISOString(),
+    };
 
-window.handleForgotPassword = async function() {
-  const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js');
-  const { auth } = await import('./firebase.js');
-  const emailEl = document.querySelector('#login-form .form-input[type="email"]');
-  const email = emailEl ? emailEl.value.trim() : '';
-  if (!email) {
-    setBubble('Введи свій email вище — надішлемо посилання для скидання пароля 📧');
-    emailEl && emailEl.focus();
-    return;
-  }
-  try {
-    await sendPasswordResetEmail(auth, email);
-    setBubble(`✓ Лист надіслано на <strong style="color:var(--mint)">${email}</strong>!<br>Перевір пошту і спам 📧`);
+    await firestoreSet(uid, idToken, {
+      name, email, instrument: user.instrument, level: user.level,
+      streak: 0, totalMinutes: 0, lessonsCompleted: 0,
+      todayMinutes: 0, dailyGoal: 20,
+    });
+
+    localStorage.setItem('lofi_user', JSON.stringify(user));
+    localStorage.setItem('lofi_tour_done', '1');
+    localStorage.setItem('lofi_uid', uid);
+    localStorage.setItem('lofi_token', idToken);
+    window.location.href = 'home.html';
   } catch(e) {
-    if (e.code === 'auth/user-not-found') setBubble('Акаунт з таким email не знайдено');
-    else setBubble('Помилка: ' + e.message);
+    btn.textContent = 'Створити профіль →'; btn.disabled = false;
+    const msgs = {
+      'EMAIL_EXISTS': 'Цей email вже зареєстровано. Спробуй увійти.',
+      'WEAK_PASSWORD': 'Пароль надто слабкий.',
+      'INVALID_EMAIL': 'Некоректний email.',
+    };
+    setBubble(msgs[e.code] || 'Помилка реєстрації. Спробуй ще раз.');
   }
 };
 
 window.doLogin = async function() {
-  const email = document.querySelector('#login-form .form-input[type="email"]').value.trim();
-  const pass  = document.querySelector('#login-form .form-input[type="password"]').value;
+  const emailEl = document.querySelector('#login-form .form-input[type="email"]');
+  const passEl  = document.querySelector('#login-form .form-input[type="password"]');
+  if (!emailEl || !passEl) return;
+  const email = emailEl.value.trim();
+  const pass  = passEl.value;
   if (!email || !pass) { setBubble('Введи email та пароль 👀'); return; }
 
-  const btn = document.querySelector('#login-form .submit-btn');
-  btn.textContent = 'Входимо...';
-  btn.disabled = true;
+  const btn = document.getElementById('login-submit-btn');
+  btn.textContent = 'Входимо...'; btn.disabled = true;
 
   try {
-    await loginUser(email, pass);
+    const data = await firebaseRequest('signInWithPassword', { email, password: pass, returnSecureToken: true });
+    const uid     = data.localId;
+    const idToken = data.idToken;
+
+    // Завантажити профіль з Firestore
+    const res = await fetch(
+      `https://firestore.googleapis.com/v1/projects/${FB_PROJECT}/databases/(default)/documents/users/${uid}`,
+      { headers: { 'Authorization': `Bearer ${idToken}` } }
+    );
+    let user = { uid, email };
+    if (res.ok) {
+      const doc = await res.json();
+      if (doc.fields) {
+        Object.entries(doc.fields).forEach(([k, v]) => {
+          user[k] = v.stringValue ?? v.integerValue ?? v.booleanValue ?? v.nullValue ?? null;
+        });
+      }
+    }
+    user.uid = uid;
+
+    localStorage.setItem('lofi_user',  JSON.stringify(user));
+    localStorage.setItem('lofi_uid',   uid);
+    localStorage.setItem('lofi_token', idToken);
     window.location.href = 'home.html';
-  } catch (err) {
-    btn.textContent = 'Увійти →';
-    btn.disabled = false;
-    let msg = 'Помилка входу. Перевір email і пароль.';
-    if (err.code === 'auth/user-not-found')   msg = 'Акаунт не знайдено. Зареєструйся спочатку.';
-    if (err.code === 'auth/wrong-password')   msg = 'Невірний пароль.';
-    if (err.code === 'auth/invalid-credential') msg = 'Невірний email або пароль.';
-    setBubble(msg);
+  } catch(e) {
+    btn.textContent = 'Увійти →'; btn.disabled = false;
+    const msgs = {
+      'EMAIL_NOT_FOUND':      'Акаунт не знайдено. Зареєструйся спочатку.',
+      'INVALID_PASSWORD':     'Невірний пароль.',
+      'INVALID_LOGIN_CREDENTIALS': 'Невірний email або пароль.',
+      'USER_DISABLED':        'Акаунт заблоковано.',
+    };
+    setBubble(msgs[e.code] || 'Невірний email або пароль.');
+  }
+};
+
+window.handleLogin = window.doLogin;
+
+window.handleForgotPassword = async function() {
+  const emailEl = document.querySelector('#login-form .form-input[type="email"]');
+  const email   = emailEl ? emailEl.value.trim() : '';
+  if (!email) { setBubble('Введи email вище 📧'); emailEl && emailEl.focus(); return; }
+  try {
+    await firebaseRequest('sendOobCode', { requestType:'PASSWORD_RESET', email });
+    setBubble(`✓ Лист надіслано на <strong style="color:var(--mint)">${email}</strong>!<br>Перевір пошту 📧`);
+  } catch(e) {
+    setBubble(e.code === 'EMAIL_NOT_FOUND' ? 'Email не знайдено' : 'Помилка: ' + e.code);
   }
 };
 </script>
