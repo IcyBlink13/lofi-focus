@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoFi Focus — Кімната практики</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:#0d1117; --bg-card:#161b22; --bg-card2:#1c2333;
+    --border:rgba(255,255,255,0.07);
+    --mint:#5ee7bf; --mint-glow:rgba(94,231,191,0.12);
+    --blue-soft:#7aa2f7; --lavender:#bb9af7;
+    --text-main:#e6edf3; --text-muted:#8b949e; --text-dim:#484f58;
+    --streak-hot:#ff9e64;
+    --phase-adapt:#7aa2f7;
+    --phase-practice:#5ee7bf;
+    --phase-repeat:#bb9af7;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg-deep); color:var(--text-main); font-family:'DM Sans',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
+
+  /* ── NAV ── */
+  nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 24px; border-bottom:1px solid var(--border);
+    flex-shrink:0; background:var(--bg-deep); z-index:10;
+  }
+  .nav-left { display:flex; align-items:center; gap:16px; }
+  .nav-logo { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--mint); text-decoration:none; }
+  .nav-logo span { color:var(--text-muted); }
+  .nav-lesson-title { font-size:13px; color:var(--text-muted); padding-left:16px; border-left:1px solid var(--border); }
+  .nav-lesson-title strong { color:var(--text-main); }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .btn-back { text-decoration:none; color:var(--text-muted); font-size:13px; padding:6px 14px; border-radius:8px; border:1px solid var(--border); transition:border-color .2s,color .2s; }
+  .btn-back:hover { border-color:var(--mint); color:var(--mint); }
+  .phase-indicator {
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:10px; padding:6px 14px;
+  }
+  .phase-dot { width:8px; height:8px; border-radius:50%; background:var(--text-dim); transition:background .4s; }
+  .phase-name { font-size:12px; color:var(--text-muted); font-weight:500; }
+
+  /* ── MAIN LAYOUT ── */
+  .room {
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    flex:1; overflow:hidden;
+  }
+
+  /* ── LEFT: VIDEO + NOTES ── */
+  .left-panel {
+    display:flex; flex-direction:column;
+    border-right:1px solid var(--border);
+    overflow:hidden;
+  }
+  .video-wrap {
+    position:relative; flex-shrink:0;
+    background:#000;
+    aspect-ratio:16/9;
+    max-height:56vh;
+  }
+  .video-wrap iframe {
+    width:100%; height:100%; border:none; display:block;
+  }
+  .video-placeholder {
+    width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; background:var(--bg-card2);
+    color:var(--text-dim); font-size:14px;
+  }
+  .video-placeholder .play-icon {
+    width:56px; height:56px; border-radius:50%;
+    background:var(--mint-glow); border:2px solid rgba(94,231,191,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; cursor:pointer; transition:background .2s;
+  }
+  .video-placeholder .play-icon:hover { background:rgba(94,231,191,0.2); }
+
+  /* notes */
+  .notes-panel {
+    flex:1; overflow-y:auto; padding:18px 20px;
+    border-top:1px solid var(--border);
+  }
+  .notes-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .notes-title { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.5px; }
+  .notes-tabs { display:flex; gap:4px; }
+  .notes-tab {
+    font-size:12px; padding:4px 10px; border-radius:6px;
+    border:1px solid var(--border); color:var(--text-dim);
+    cursor:pointer; transition:border-color .2s,color .2s;
+    background:none; font-family:'DM Sans',sans-serif;
+  }
+  .notes-tab.active { border-color:var(--mint); color:var(--mint); background:var(--mint-glow); }
+
+  /* chord sheet */
+  .chord-sheet { display:none; }
+  .chord-sheet.active { display:block; }
+  .chord-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .chord-card {
+    background:var(--bg-card2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; min-width:80px;
+    text-align:center;
+  }
+  .chord-name { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:6px; }
+  .chord-diagram { font-size:11px; color:var(--text-muted); line-height:1.6; font-family:'Space Mono',monospace; }
+
+  /* my notes */
+  .my-notes-area {
+    width:100%; min-height:120px;
+    background:var(--bg-card2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px;
+    color:var(--text-main); font-size:13px;
+    font-family:'DM Sans',sans-serif; resize:vertical;
+    outline:none; transition:border-color .2s;
+    line-height:1.6;
+  }
+  .my-notes-area:focus { border-color:rgba(94,231,191,0.3); }
+  .my-notes-area::placeholder { color:var(--text-dim); }
+
+  /* lesson steps */
+  .steps-list { display:none; flex-direction:column; gap:8px; }
+  .steps-list.active { display:flex; }
+  .step-item {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 12px; border-radius:10px;
+    border:1px solid var(--border); background:var(--bg-card2);
+    cursor:pointer; transition:border-color .2s;
+  }
+  .step-item:hover { border-color:rgba(94,231,191,0.25); }
+  .step-item.done { border-color:rgba(94,231,191,0.3); opacity:.7; }
+  .step-check {
+    width:18px; height:18px; border-radius:50%;
+    border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; transition:background .2s,border-color .2s;
+  }
+  .step-item.done .step-check { background:var(--mint); border-color:var(--mint); color:var(--bg-deep); }
+  .step-text { font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .step-item.done .step-text { text-decoration:line-through; color:var(--text-dim); }
+
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    display:flex; flex-direction:column;
+    overflow:hidden; background:var(--bg-deep);
+  }
+
+  /* TIMER SETUP */
+  .timer-setup {
+    padding:24px 20px; border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .setup-title { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px; }
+  .duration-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
+  .dur-btn {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:8px; padding:8px 4px; font-size:12px;
+    color:var(--text-muted); cursor:pointer; text-align:center;
+    transition:border-color .2s,color .2s,background .2s;
+    font-family:'DM Sans',sans-serif;
+  }
+  .dur-btn:hover { border-color:rgba(94,231,191,0.3); color:var(--text-main); }
+  .dur-btn.selected { border-color:var(--mint); background:var(--mint-glow); color:var(--mint); }
+  .dur-btn .dur-min { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; display:block; }
+  .dur-btn .dur-label { font-size:10px; color:var(--text-dim); display:block; margin-top:2px; }
+  .dur-btn.selected .dur-label { color:var(--mint); }
+
+  .phase-preview {
+    display:flex; gap:4px; margin-bottom:14px;
+  }
+  .phase-bar {
+    height:6px; border-radius:3px;
+    transition:flex .3s;
+  }
+  .phase-bar.adapt    { background:var(--phase-adapt);    flex:2; }
+  .phase-bar.practice { background:var(--phase-practice); flex:6; }
+  .phase-bar.repeat   { background:var(--phase-repeat);   flex:2; }
+
+  .phase-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim); margin-bottom:14px; }
+
+  .start-btn {
+    width:100%; background:var(--mint); color:var(--bg-deep);
+    font-size:15px; font-weight:700; padding:12px;
+    border-radius:12px; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif;
+    transition:opacity .2s,transform .15s;
+  }
+  .start-btn:hover { opacity:.88; transform:translateY(-1px); }
+  .start-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+  /* TIMER ACTIVE */
+  .timer-active {
+    padding:20px; border-bottom:1px solid var(--border);
+    flex-shrink:0; display:none;
+  }
+  .timer-phase-label {
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    font-family:'Space Mono',monospace; margin-bottom:8px;
+    color:var(--text-dim);
+  }
+  .timer-phase-desc { font-size:13px; color:var(--text-muted); margin-bottom:16px; }
+  .timer-display {
+    font-family:'Space Mono',monospace; font-size:52px; font-weight:700;
+    text-align:center; margin-bottom:12px; line-height:1;
+    transition:color .4s;
+  }
+  .timer-progress-wrap {
+    background:var(--bg-card2); border-radius:6px; height:6px; margin-bottom:16px; overflow:hidden;
+  }
+  .timer-progress-bar {
+    height:100%; border-radius:6px;
+    transition:width .5s linear, background .4s;
+    background:var(--mint);
+  }
+  .timer-controls { display:flex; gap:8px; }
+  .ctrl-btn {
+    flex:1; padding:10px; border-radius:10px; border:1px solid var(--border);
+    background:var(--bg-card); color:var(--text-muted);
+    font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif;
+    transition:border-color .2s,color .2s,background .2s;
+  }
+  .ctrl-btn:hover { border-color:var(--mint); color:var(--mint); background:var(--mint-glow); }
+  .ctrl-btn.primary { background:var(--mint); color:var(--bg-deep); border-color:var(--mint); font-weight:600; }
+  .ctrl-btn.primary:hover { opacity:.88; }
+  .ctrl-btn.danger { color:var(--streak-hot); border-color:rgba(255,158,100,0.2); }
+  .ctrl-btn.danger:hover { background:rgba(255,158,100,0.08); border-color:var(--streak-hot); }
+
+  /* phase dots row */
+  .phase-steps {
+    display:flex; gap:6px; margin-bottom:12px;
+  }
+  .phase-step {
+    flex:1; height:4px; border-radius:2px;
+    background:var(--bg-card2);
+    transition:background .4s;
+  }
+  .phase-step.active { background:var(--mint); }
+  .phase-step.done   { background:rgba(94,231,191,0.35); }
+
+  /* BOTTOM: session info + mascot */
+  .right-bottom {
+    flex:1; overflow-y:auto; padding:16px 20px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .session-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  }
+  .sess-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px;
+  }
+  .sess-label { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .sess-val { font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--text-main); }
+  .sess-val .unit { font-size:11px; font-weight:400; color:var(--text-muted); margin-left:2px; font-family:'DM Sans',sans-serif; }
+
+  /* mascot corner in right panel */
+  .mascot-corner {
+    display:flex; align-items:flex-end; gap:12px; margin-top:auto;
+  }
+  .mascot-corner-img {
+    width:72px; flex-shrink:0; object-fit:contain;
+    animation:idle-float 3.5s ease-in-out infinite;
+    filter:drop-shadow(0 4px 12px rgba(94,231,191,0.15));
+    cursor:pointer;
+  }
+  @keyframes idle-float { 0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-6px) rotate(1deg);} }
+  .mascot-corner-bubble {
+    background:var(--bg-card); border:1px solid rgba(94,231,191,0.2);
+    border-radius:12px 12px 12px 4px;
+    padding:10px 12px; font-size:12px; color:var(--text-muted);
+    line-height:1.55; flex:1;
+    animation:fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FINISH OVERLAY */
+  #finish-overlay {
+    position:fixed; inset:0; z-index:100;
+    background:rgba(0,0,0,0.85);
+    display:none; align-items:center; justify-content:center;
+  }
+  #finish-overlay.show { display:flex; }
+  .finish-card {
+    background:var(--bg-card); border:1px solid rgba(94,231,191,0.3);
+    border-radius:24px; padding:40px 36px; width:400px; text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .finish-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--mint),transparent); }
+  .finish-mascot { width:110px; object-fit:contain; margin-bottom:12px; animation:idle-float 3.5s ease-in-out infinite; }
+  .finish-title { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; margin-bottom:8px; }
+  .finish-title .accent { color:var(--mint); }
+  .finish-sub { font-size:14px; color:var(--text-muted); margin-bottom:24px; line-height:1.6; }
+  .finish-stats { display:flex; gap:12px; justify-content:center; margin-bottom:28px; }
+  .finish-stat { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px 20px; }
+  .finish-stat-val { font-family:'Space Mono',monospace; font-size:24px; font-weight:700; color:var(--mint); }
+  .finish-stat-label { font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .finish-btns { display:flex; gap:10px; }
+  .finish-btn { flex:1; padding:12px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity .2s; border:none; }
+  .finish-btn.primary { background:var(--mint); color:var(--bg-deep); }
+  .finish-btn.secondary { background:var(--bg-card2); color:var(--text-muted); border:1px solid var(--border); }
+  .finish-btn:hover { opacity:.85; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .left-panel  { animation:fadeUp .4s ease both; }
+  .right-panel { animation:fadeUp .4s .08s ease both; }
+</style>
+</head>
+<body>
+
+<!-- FINISH OVERLAY -->
+<div id="finish-overlay">
+  <div class="finish-card">
+    <img id="finish-mascot" src="kael_guide.png" class="finish-mascot" alt="Маскот">
+    <div class="finish-title">Сесію <span class="accent">завершено!</span> 🎉</div>
+    <div class="finish-sub" id="finish-sub">Відмінна робота! Ти провів продуктивну практику.</div>
+    <div class="finish-stats">
+      <div class="finish-stat">
+        <div class="finish-stat-val" id="finish-time">0</div>
+        <div class="finish-stat-label">хвилин</div>
+      </div>
+      <div class="finish-stat">
+        <div class="finish-stat-val" id="finish-phases">3</div>
+        <div class="finish-stat-label">фази</div>
+      </div>
+    </div>
+    <div class="finish-btns">
+      <button class="finish-btn secondary" onclick="window.location.href='home.html'">← На головну</button>
+      <button class="finish-btn primary" onclick="restartSession()">Ще одна сесія →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
+    <a href="home.html" class="nav-logo">lo<span>.</span>fi<span>·</span>focus</a>
+    <div class="nav-lesson-title">
+      <strong id="nav-lesson-name">Гітара — Перехід Am → E</strong>
+    </div>
+  </div>
+  <div class="nav-right">
+    <div class="phase-indicator">
+      <div class="phase-dot" id="nav-phase-dot"></div>
+      <span class="phase-name" id="nav-phase-name">Готовий до початку</span>
+    </div>
+    <a href="home.html" class="btn-back">← Вийти</a>
+  </div>
+</nav>
+
+<!-- ROOM -->
+<div class="room">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+    <!-- VIDEO -->
+    <div class="video-wrap" id="video-wrap">
+      <div class="video-placeholder" id="video-placeholder">
+        <div class="play-icon" onclick="loadVideo()">▶</div>
+        <div>Натисни щоб завантажити відео уроку</div>
+        <div style="font-size:12px;color:var(--text-dim)">YouTube · Гітара — Перехід Am → E</div>
+      </div>
+    </div>
+
+    <!-- NOTES / CHORDS / STEPS -->
+    <div class="notes-panel">
+      <div class="notes-header">
+        <div class="notes-title">Матеріали уроку</div>
+        <div class="notes-tabs">
+          <button class="notes-tab active" onclick="switchTab('chords',this)">Акорди</button>
+          <button class="notes-tab" onclick="switchTab('steps',this)">Кроки</button>
+          <button class="notes-tab" onclick="switchTab('mynotes',this)">Нотатки</button>
+        </div>
+      </div>
+
+      <!-- CHORDS TAB -->
+      <div class="chord-sheet active" id="tab-chords">
+        <div class="chord-row" id="chord-row"></div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px;">
+          X = не грати · 0 = відкрита струна · цифра = лад
+        </div>
+      </div>
+
+      <!-- STEPS TAB -->
+      <div class="steps-list" id="tab-steps"></div>
+
+      <!-- MY NOTES TAB -->
+      <div class="chord-sheet" id="tab-mynotes">
+        <textarea class="my-notes-area" id="my-notes"
+          placeholder="Записуй що важко дається, що вийшло, на що звернути увагу наступного разу..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+          <button onclick="saveNotes()" style="background:var(--mint);color:var(--bg-deep);border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Зберегти</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+
+    <!-- TIMER SETUP -->
+    <div class="timer-setup" id="timer-setup">
+      <div class="setup-title">Фазовий таймер</div>
+      <div class="duration-grid">
+        <button class="dur-btn" onclick="selectDur(15,this)">
+          <span class="dur-min">15</span><span class="dur-label">хв</span>
+        </button>
+        <button class="dur-btn selected" onclick="selectDur(30,this)">
+          <span class="dur-min">30</span><span class="dur-label">хв · рекомендовано</span>
+        </button>
+        <button class="dur-btn" onclick="selectDur(45,this)">
+          <span class="dur-min">45</span><span class="dur-label">хв</span>
+        </button>
+        <button class="dur-btn" onclick="selectDur(60,this)">
+          <span class="dur-min">60</span><span class="dur-label">хв</span>
+        </button>
+      </div>
+
+      <div class="phase-preview">
+        <div class="phase-bar adapt"></div>
+        <div class="phase-bar practice"></div>
+        <div class="phase-bar repeat"></div>
+      </div>
+      <div class="phase-labels">
+        <span id="lbl-adapt" style="color:var(--phase-adapt)">🔵 Адаптація · 20%</span>
+        <span id="lbl-practice" style="color:var(--phase-practice)">🟢 Практика · 60%</span>
+        <span id="lbl-repeat" style="color:var(--phase-repeat)">🟣 Повторення · 20%</span>
+      </div>
+      <div id="phase-time-hint" style="font-size:12px;color:var(--text-dim);margin-bottom:14px;text-align:center;">
+        6 хв · 18 хв · 6 хв
+      </div>
+      <button class="start-btn" id="start-btn" onclick="startTimer()">▶ Почати сесію</button>
+    </div>
+
+    <!-- TIMER ACTIVE -->
+    <div class="timer-active" id="timer-active">
+      <div class="phase-steps">
+        <div class="phase-step" id="pstep-0"></div>
+        <div class="phase-step" id="pstep-1"></div>
+        <div class="phase-step" id="pstep-2"></div>
+      </div>
+      <div class="timer-phase-label" id="timer-phase-label">АДАПТАЦІЯ</div>
+      <div class="timer-phase-desc" id="timer-phase-desc">Ознайомся з матеріалом, не поспішай</div>
+      <div class="timer-display" id="timer-display">06:00</div>
+      <div class="timer-progress-wrap">
+        <div class="timer-progress-bar" id="timer-progress-bar" style="width:100%"></div>
+      </div>
+      <div class="timer-controls">
+        <button class="ctrl-btn primary" id="ctrl-playpause" onclick="togglePause()">⏸ Пауза</button>
+        <button class="ctrl-btn" onclick="skipPhase()">⏭ Пропустити</button>
+        <button class="ctrl-btn danger" onclick="stopTimer()">✕ Стоп</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="right-bottom">
+      <!-- SESSION STATS -->
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Ця сесія</div>
+        <div class="session-stats">
+          <div class="sess-card">
+            <div class="sess-label">Час</div>
+            <div class="sess-val" id="sess-elapsed">0<span class="unit">хв</span></div>
+          </div>
+          <div class="sess-card">
+            <div class="sess-label">Поточна фаза</div>
+            <div class="sess-val" id="sess-phase" style="font-size:13px;color:var(--text-muted);">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASCOT -->
+      <div class="mascot-corner">
+        <img src="kael_guide.png" class="mascot-corner-img" id="mascot-img" onclick="toggleMascotBubble()" alt="Маскот">
+        <div class="mascot-corner-bubble" id="mascot-bubble">
+          Вибери тривалість і натисни «Почати» — я буду поруч! 🎸
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="practice.js"></script>
+</body>
+</html>

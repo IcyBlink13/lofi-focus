@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoFi Focus — Головна</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
+    --border:rgba(255,255,255,0.07);
+    --mint:#5ee7bf;--mint-dim:#3ab89a;--mint-glow:rgba(94,231,191,0.12);
+    --blue-soft:#7aa2f7;--lavender:#bb9af7;
+    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+    --streak-hot:#ff9e64;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px;}
+
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);}
+  .nav-logo span{color:var(--text-muted);}
+  .nav-links{display:flex;gap:8px;align-items:center;}
+  .nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;padding:6px 14px;border-radius:8px;transition:background .2s,color .2s;}
+  .nav-links a:hover{background:var(--bg-card2);color:var(--text-main);}
+  .nav-links a.active{color:var(--mint);}
+  .nav-right{display:flex;align-items:center;gap:10px;}
+  .nav-inst-badge{font-size:12px;color:var(--text-dim);background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:5px 12px;}
+  .nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--mint-dim),var(--blue-soft));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg-deep);cursor:pointer;position:relative;}
+  .nav-avatar-menu{position:absolute;top:42px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:8px;width:160px;display:none;z-index:100;box-shadow:0 12px 32px rgba(0,0,0,0.4);}
+  .nav-avatar-menu.open{display:block;}
+  .nav-avatar-menu a{display:block;padding:8px 12px;font-size:13px;color:var(--text-muted);text-decoration:none;border-radius:8px;transition:background .2s,color .2s;}
+  .nav-avatar-menu a:hover{background:var(--bg-card2);color:var(--text-main);}
+  .nav-avatar-menu .logout{color:var(--streak-hot);}
+
+  /* HERO */
+  .hero{display:grid;grid-template-columns:1fr 300px;gap:32px;padding:40px 0 32px;align-items:start;}
+  .hero-greeting{font-size:13px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;}
+  .hero-name{font-family:'Space Mono',monospace;font-size:34px;font-weight:700;line-height:1.15;margin-bottom:6px;}
+  .hero-name .accent{color:var(--mint);}
+  .hero-subtitle{font-size:15px;color:var(--text-muted);margin-bottom:28px;line-height:1.6;}
+  .streak-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+  .streak-badge{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;}
+  .streak-flame{font-size:22px;animation:flicker 2s ease-in-out infinite alternate;}
+  @keyframes flicker{0%{transform:scale(1) rotate(-3deg);}100%{transform:scale(1.1) rotate(3deg);}}
+  .streak-num{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;color:var(--streak-hot);}
+  .streak-label{font-size:13px;color:var(--text-muted);}
+  .quick-btn{display:inline-flex;align-items:center;gap:8px;background:var(--mint);color:var(--bg-deep);font-size:14px;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;}
+  .quick-btn:hover{opacity:.88;transform:translateY(-1px);}
+
+  /* MASCOT PANEL */
+  .mascot-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;overflow:hidden;}
+  .mascot-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--mint),transparent);}
+  .mascot-name-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint);letter-spacing:1.5px;text-transform:uppercase;}
+  .mascot-img{width:220px;height:270px;object-fit:contain;animation:idle-float 3.5s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(94,231,191,0.15));}
+  @keyframes idle-float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
+  .mascot-bubble{background:var(--bg-card2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;font-size:12.5px;color:var(--text-muted);text-align:center;line-height:1.55;position:relative;transition:opacity .4s;}
+  .mascot-bubble::before{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-bottom-color:var(--bg-card2);border-top:none;}
+
+  /* STATS */
+  .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;transition:border-color .2s;}
+  .stat-card:hover{border-color:rgba(94,231,191,0.25);}
+  .stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .stat-value{font-family:'Space Mono',monospace;font-size:26px;font-weight:700;}
+  .stat-value .unit{font-size:13px;font-weight:400;color:var(--text-muted);margin-left:3px;font-family:'DM Sans',sans-serif;}
+  .stat-delta{font-size:12px;color:var(--mint);margin-top:4px;}
+
+  /* SECTION */
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+  .section-title{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;}
+  .section-link{font-size:12px;color:var(--mint);text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid rgba(94,231,191,0.2);transition:background .2s;}
+  .section-link:hover{background:var(--mint-glow);}
+
+  /* LESSONS */
+  .lessons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+  .lesson-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px;cursor:pointer;transition:border-color .2s,transform .2s;text-decoration:none;display:block;position:relative;overflow:hidden;}
+  .lesson-card:hover{border-color:rgba(94,231,191,0.3);transform:translateY(-2px);}
+  .lesson-card.done::after{content:'✓';position:absolute;top:12px;right:12px;width:20px;height:20px;background:var(--mint);color:var(--bg-deep);border-radius:50%;font-size:11px;font-weight:700;line-height:20px;text-align:center;}
+  .lesson-instrument{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:8px;}
+  .lesson-title{font-size:14px;font-weight:500;color:var(--text-main);margin-bottom:10px;line-height:1.4;}
+  .lesson-meta{display:flex;align-items:center;gap:8px;}
+  .lesson-pill{font-size:11px;padding:3px 9px;border-radius:6px;background:var(--bg-card2);color:var(--text-muted);}
+  .lesson-pill.beginner{color:var(--mint);background:var(--mint-glow);}
+  .lesson-pill.medium{color:var(--blue-soft);background:rgba(122,162,247,0.1);}
+  .lesson-time{font-size:11px;color:var(--text-dim);margin-left:auto;}
+
+  /* ACHIEVEMENTS */
+  .achievements-row{display:flex;gap:12px;margin-bottom:36px;flex-wrap:wrap;}
+  .ach-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;display:flex;align-items:center;gap:12px;flex:1;min-width:180px;transition:border-color .2s;}
+  .ach-card:hover{border-color:rgba(187,154,247,0.3);}
+  .ach-icon{font-size:26px;flex-shrink:0;}
+  .ach-name{font-size:13px;font-weight:500;color:var(--text-main);}
+  .ach-desc{font-size:11px;color:var(--text-dim);margin-top:2px;}
+  .ach-card.locked{opacity:.4;}
+
+  /* HEATMAP */
+  .heatmap-section{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:40px;}
+  .heatmap-title{font-size:13px;color:var(--text-muted);margin-bottom:16px;font-weight:500;}
+  .heatmap-grid{display:flex;gap:3px;flex-wrap:wrap;}
+  .hm-cell{width:13px;height:13px;border-radius:3px;background:var(--bg-card2);}
+  .hm-cell.l1{background:rgba(94,231,191,0.2);}
+  .hm-cell.l2{background:rgba(94,231,191,0.45);}
+  .hm-cell.l3{background:rgba(94,231,191,0.75);}
+  .hm-cell.l4{background:var(--mint);}
+
+  footer{border-top:1px solid var(--border);padding:20px 0;text-align:center;font-size:12px;color:var(--text-dim);font-family:'Space Mono',monospace;margin-top:8px;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .hero           {animation:fadeUp .5s ease both;}
+  .stats-row      {animation:fadeUp .5s .1s ease both;}
+  .lessons-grid   {animation:fadeUp .5s .2s ease both;}
+  .achievements-row{animation:fadeUp .5s .3s ease both;}
+  .heatmap-section{animation:fadeUp .5s .35s ease both;}
+
+  /* IDLE MASCOT corner */
+  #kael-idle{position:fixed;bottom:24px;right:28px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
+  #kael-idle-img{width:80px;object-fit:contain;cursor:pointer;animation:idle-float 3.5s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(94,231,191,0.2));transition:transform .2s;}
+  #kael-idle-img:hover{transform:scale(1.1) rotate(4deg) !important;}
+  #kael-idle-bubble{background:var(--bg-card);border:1px solid rgba(94,231,191,0.25);border-radius:12px 12px 4px 12px;padding:9px 12px;font-size:12px;color:var(--text-muted);max-width:200px;text-align:right;line-height:1.5;display:none;}
+  #kael-idle-bubble.show{display:block;animation:fadeUp .3s ease both;}
+</style>
+</head>
+<body>
+
+<!-- IDLE MASCOT corner -->
+<div id="kael-idle">
+  <div id="kael-idle-bubble"></div>
+  <img src="kael_guide.png" id="kael-idle-img" alt="Маскот" onclick="toggleIdleBubble()" onerror="this.src='kael_guide.png'">
+</div>
+
+<div class="page">
+
+  <!-- NAV -->
+  <nav>
+    <div class="nav-logo">lo<span>.</span>fi<span>·</span>focus</div>
+    <div class="nav-links">
+      <a href="home.html" class="active">Головна</a>
+      <a href="lessons.html">Уроки</a>
+      <a href="progress.html">Прогрес</a>
+    </div>
+    <div class="nav-right">
+      <div class="nav-inst-badge" id="nav-inst-badge">🎸 Гітара</div>
+      <div class="nav-avatar" id="nav-avatar" title="Профіль" onclick="toggleMenu(event)"><span id="nav-initials">??</span>
+        <div class="nav-avatar-menu" id="nav-menu">
+          <a href="profile.html">👤 Профіль</a>
+          <a href="settings.html">⚙️ Налаштування</a>
+          <a href="index.html" class="logout" onclick="logout()">🚪 Вийти</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-left">
+      <div class="hero-greeting" id="hero-greeting">Добрий вечір</div>
+      <div class="hero-name">Привіт, <span class="accent" id="hero-name"></span> 👋</div>
+      <div class="hero-subtitle" id="hero-subtitle">Ваш останній урок: <strong style="color:var(--text-main)" id="last-lesson">Гітара — Перехід Am → E</strong><br>Продовжимо де зупинились?</div>
+      <div class="streak-row" id="streak-row">
+        <div class="streak-badge">
+          <span class="streak-flame">🔥</span>
+          <span class="streak-num" id="streak-num">0</span>
+          <span class="streak-label">днів поспіль</span>
+        </div>
+        <a href="#" class="quick-btn" id="quick-btn">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+          Продовжити урок
+        </a>
+      </div>
+    </div>
+
+    <!-- MASCOT -->
+    <div class="mascot-panel">
+      <div class="mascot-name-tag" id="mascot-name-tag">Каель · ваш гід</div>
+      <img src="kael_guide.png" class="mascot-img" id="mascot-img" alt="Маскот" onerror="this.src='kael_guide.png'">
+      <div class="mascot-bubble" id="mascot-bubble">
+        Сьогодні вже <strong style="color:var(--mint)">7 днів</strong> поспіль! 🎉<br>
+        Ще трохи — і ти вже справжній музикант.
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div id="stats-section"></div>
+
+  <!-- LESSONS -->
+  <div id="lessons-section"></div>
+
+  <!-- ACHIEVEMENTS -->
+  <div id="achievements-section"></div>
+
+  <!-- HEATMAP -->
+  <div class="heatmap-section">
+    <div class="heatmap-title">Активність за останні 10 тижнів</div>
+    <div class="heatmap-grid" id="heatmap"></div>
+  </div>
+
+  <footer>lo.fi·focus · v0.1 · зроблено з ♥ для музикантів</footer>
+</div>
+
+<script src="home.js"></script>
+</body>
+</html>

@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoFi Focus — Реєстрація</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
+    --border:rgba(255,255,255,0.07);--border-focus:rgba(94,231,191,0.4);
+    --mint:#5ee7bf;--mint-dim:#3ab89a;--mint-glow:rgba(94,231,191,0.12);
+    --blue-soft:#7aa2f7;--lavender:#bb9af7;
+    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+    --error:#e85d75;--error-bg:rgba(232,93,117,0.08);
+    --warn:#ff9e64;--success:#5ee7bf;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;display:grid;grid-template-columns:320px 1fr;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
+    background-size:44px 44px;}
+
+  /* ── LEFT panel ── */
+  .left-panel{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;border-right:1px solid var(--border);gap:16px;}
+  .left-logo{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--mint);position:absolute;top:28px;left:28px;}
+  .left-logo span{color:var(--text-muted);}
+  .left-mascot{width:400px;height:420px;object-fit:contain;animation:idle-float 3.5s ease-in-out infinite;filter:drop-shadow(0 10px 28px rgba(94,231,191,0.18));}
+  @keyframes idle-float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
+  .left-bubble{background:var(--bg-card);border:1px solid rgba(94,231,191,0.2);border-radius:14px 14px 14px 4px;padding:11px 13px;font-size:12.5px;color:var(--text-muted);line-height:1.6;max-width:260px;transition:opacity .35s;}
+  .left-bubble strong{color:var(--mint);}
+  .left-mascot-name{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint);letter-spacing:1.5px;text-transform:uppercase;}
+
+  /* ── RIGHT panel ── */
+  .right-panel{position:relative;z-index:1;display:flex;flex-direction:column;justify-content:center;padding:40px 52px;overflow-y:auto;}
+  .form-title{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;margin-bottom:6px;}
+  .form-title .accent{color:var(--mint);}
+  .form-sub{font-size:14px;color:var(--text-muted);margin-bottom:28px;}
+  .form-sub a{color:var(--mint);text-decoration:none;}
+
+  /* ── Inputs ── */
+  .form-group{margin-bottom:14px;position:relative;}
+  .form-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--text-muted);letter-spacing:.5px;margin-bottom:6px;font-weight:500;}
+  .form-input{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:11px 14px;font-size:14px;color:var(--text-main);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s;}
+  .form-input:focus{border-color:var(--border-focus);box-shadow:0 0 0 3px rgba(94,231,191,0.08);}
+  .form-input::placeholder{color:var(--text-dim);}
+  .form-input.is-error{border-color:var(--error);background:var(--error-bg);}
+  .form-input.is-ok{border-color:rgba(94,231,191,0.4);}
+  .field-msg{font-size:11px;margin-top:5px;min-height:14px;padding-left:2px;}
+  .field-msg.err{color:var(--error);}
+  .field-msg.ok {color:var(--mint);}
+
+  /* ── Password strength bar ── */
+  .pass-strength{display:flex;gap:4px;margin-top:6px;}
+  .pass-bar{flex:1;height:3px;border-radius:2px;background:var(--bg-card2);transition:background .3s;}
+  .pass-bar.weak  {background:var(--error);}
+  .pass-bar.medium{background:var(--warn);}
+  .pass-bar.strong{background:var(--mint);}
+  .pass-strength-label{font-size:11px;color:var(--text-dim);margin-top:4px;}
+
+  /* ── Instrument grid ── */
+  .picker-label{font-size:12px;color:var(--text-muted);letter-spacing:.5px;margin-bottom:8px;font-weight:500;display:block;}
+  .inst-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+  .inst-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:10px 8px;font-size:12px;color:var(--text-muted);cursor:pointer;text-align:center;transition:border-color .2s,color .2s,background .2s;font-family:'DM Sans',sans-serif;line-height:1.4;}
+  .inst-btn .inst-em{font-size:18px;display:block;margin-bottom:3px;}
+  .inst-btn:hover{border-color:rgba(94,231,191,0.3);color:var(--text-main);}
+  .inst-btn.selected{border-color:var(--mint);background:var(--mint-glow);color:var(--mint);}
+
+  /* ── Level grid ── */
+  .level-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px;}
+  .level-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:12px 10px;cursor:pointer;text-align:left;transition:border-color .2s,background .2s;font-family:'DM Sans',sans-serif;display:flex;flex-direction:column;gap:3px;}
+  .level-btn:hover{border-color:rgba(94,231,191,0.3);}
+  .level-btn.selected{border-color:var(--mint);background:var(--mint-glow);}
+  .level-btn.selected .level-name{color:var(--mint);}
+  .level-em{font-size:18px;}
+  .level-name{font-size:12px;font-weight:600;color:var(--text-main);}
+  .level-desc{font-size:10.5px;color:var(--text-dim);line-height:1.4;}
+
+  .picker-hint{font-size:11.5px;color:var(--text-dim);margin-bottom:16px;min-height:14px;transition:opacity .3s;}
+
+  /* ── Submit ── */
+  .submit-btn{width:100%;background:var(--mint);color:var(--bg-deep);font-size:15px;font-weight:700;padding:13px;border-radius:12px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s,transform .15s;margin-top:4px;}
+  .submit-btn:hover{opacity:.88;transform:translateY(-1px);}
+  .submit-btn:active{transform:translateY(0);}
+  .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+
+  .terms{font-size:11.5px;color:var(--text-dim);text-align:center;margin-top:12px;line-height:1.6;}
+  .terms a{color:var(--text-muted);text-decoration:underline;}
+
+  .form-divider{display:flex;align-items:center;gap:12px;margin:4px 0 16px;color:var(--text-dim);font-size:12px;}
+  .form-divider::before,.form-divider::after{content:'';flex:1;height:1px;background:var(--border);}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+  .left-panel {animation:fadeUp .5s ease both;}
+  .right-panel{animation:fadeUp .5s .1s ease both;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+  .shake{animation:shake .35s ease;}
+</style>
+</head>
+<body>
+
+<!-- LEFT -->
+<div class="left-panel">
+  <div class="left-logo">lo<span>.</span>fi<span>·</span>focus</div>
+  <div class="left-mascot-name" id="mascot-name-label">Каель · ваш гід</div>
+  <img src="kael_guide.png" id="mascot-img" class="left-mascot" alt="Маскот">
+  <div class="left-bubble" id="mascot-bubble">
+    Привіт! Я <strong>Каель</strong> 👋<br>
+    Давай створимо твій профіль — займе менше хвилини!
+  </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right-panel">
+  <div class="form-title">Створити <span class="accent">профіль</span></div>
+  <div class="form-sub">Вже маєш акаунт? <a href="#" onclick="switchToLogin()">Увійти →</a></div>
+
+  <!-- REGISTER FORM -->
+  <div id="register-form">
+
+    <!-- Ім'я -->
+    <div class="form-group">
+      <label class="form-label">Твоє ім'я</label>
+      <input class="form-input" type="text" id="inp-name" placeholder="Як тебе звати?" oninput="onNameInput(this.value)">
+      <div class="field-msg" id="msg-name"></div>
+    </div>
+
+    <!-- Email -->
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="inp-email" placeholder="example@gmail.com" oninput="validateEmail(this)">
+      <div class="field-msg" id="msg-email"></div>
+    </div>
+
+    <!-- Пароль -->
+    <div class="form-group">
+      <label class="form-label">
+        Пароль
+        <span id="pass-strength-label" class="pass-strength-label" style="font-size:11px;font-weight:400;letter-spacing:0;"></span>
+      </label>
+      <input class="form-input" type="password" id="inp-pass" placeholder="Мінімум 8 символів" oninput="validatePass(this)">
+      <div class="pass-strength" id="pass-bars">
+        <div class="pass-bar" id="bar1"></div>
+        <div class="pass-bar" id="bar2"></div>
+        <div class="pass-bar" id="bar3"></div>
+        <div class="pass-bar" id="bar4"></div>
+      </div>
+      <div class="field-msg" id="msg-pass"></div>
+    </div>
+
+    <!-- Інструмент -->
+    <label class="picker-label" style="margin-top:4px;">Який інструмент хочеш вивчити?</label>
+    <div class="inst-grid">
+      <button class="inst-btn" onclick="selectInst(this,'guitar')"><span class="inst-em">🎸</span>Гітара</button>
+      <button class="inst-btn" onclick="selectInst(this,'piano')"><span class="inst-em">🎹</span>Фортепіано</button>
+      <button class="inst-btn" onclick="selectInst(this,'ukulele')"><span class="inst-em">🪗</span>Укулеле</button>
+      <button class="inst-btn" onclick="selectInst(this,'violin')"><span class="inst-em">🎻</span>Скрипка</button>
+      <button class="inst-btn" onclick="selectInst(this,'flute')"><span class="inst-em">🎵</span>Флейта</button>
+      <button class="inst-btn" onclick="selectInst(this,'vocal')"><span class="inst-em">🎤</span>Вокал</button>
+    </div>
+    <div class="picker-hint" id="inst-hint"></div>
+
+    <!-- Рівень -->
+    <label class="picker-label">Твій рівень</label>
+    <div class="level-grid">
+      <button class="level-btn" onclick="selectLevel(this,'beginner')">
+        <span class="level-em">🌱</span>
+        <span class="level-name">Початківець</span>
+        <span class="level-desc">Ніколи не грав або тільки починаю</span>
+      </button>
+      <button class="level-btn" onclick="selectLevel(this,'middle')">
+        <span class="level-em">🎯</span>
+        <span class="level-name">Середній</span>
+        <span class="level-desc">Знаю основи, хочу рости далі</span>
+      </button>
+      <button class="level-btn" onclick="selectLevel(this,'advanced')">
+        <span class="level-em">🔥</span>
+        <span class="level-name">Впевнений</span>
+        <span class="level-desc">Граю давно, вдосконалюю техніку</span>
+      </button>
+    </div>
+    <div class="picker-hint" id="level-hint" style="margin-bottom:18px;"></div>
+
+    <button class="submit-btn" id="submit-btn" onclick="doRegister()">Створити профіль →</button>
+    <div class="terms">Реєструючись, ти погоджуєшся з <a href="#">умовами використання</a> та <a href="#">політикою конфіденційності</a>.</div>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="login-form" style="display:none;">
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" placeholder="example@gmail.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Пароль</label>
+      <input class="form-input" type="password" placeholder="Твій пароль">
+    </div>
+    <button class="submit-btn" onclick="doLogin()">Увійти →</button>
+    <div class="form-divider" style="margin-top:18px;">або</div>
+    <div style="text-align:center;font-size:13px;color:var(--text-muted);">Немає акаунту? <a href="#" style="color:var(--mint);text-decoration:none;" onclick="switchToRegister()">Зареєструватись →</a></div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+//  DATA
+// ═══════════════════════════════════════
+const INST_DATA={
+  guitar: {hint:'Відмінний вибір! Я — <strong style="color:var(--mint)">Каель</strong> — особисто проведу тебе через всі уроки гітари 🎸', mascot:'kael_guitar.jpg', label:'Каель · гітара'},
+  piano:  {hint:'Фортепіано — класика! Починаємо з базових акордів 🎹', mascot:'kael_guide.png', label:'Каель · ваш гід'},
+  ukulele:{hint:'Укулеле — ідеальний старт! Вже через тиждень зможеш грати пісні 🪗', mascot:'kael_guide.png', label:'Каель · ваш гід'},
+  violin: {hint:'Скрипка вимагає терпіння — але результат того вартий! 🎻', mascot:'kael_guide.png', label:'Каель · ваш гід'},
+  flute:  {hint:'Флейта? Тоді твоїм гідом буде <strong style="color:var(--lavender)">Корі</strong>! Вона вже чекає 🎵', mascot:'kori_flute.jpg', label:'Корі · флейта'},
+  vocal:  {hint:'Вокал — це теж інструмент! <strong style="color:var(--lavender)">Корі</strong> стане твоїм особистим тренером 🎤', mascot:'kori_mic.jpg', label:'Корі · вокал'},
+};
+
+const LEVEL_HINTS={
+  beginner:'Чудово! Почнемо з самого початку — крок за кроком 🌱',
+  middle:  'Окей, базу знаєш — значить відразу до цікавого 🎯',
+  advanced:'Серйозно налаштований! Підберемо складніші матеріали 🔥',
+};
+
+// Allowed email domains
+const ALLOWED_DOMAINS=['gmail.com','ukr.net','outlook.com','hotmail.com','yahoo.com','icloud.com','meta.ua','i.ua','bigmir.net','proton.me','protonmail.com'];
+
+let selectedInst=null, selectedLevel=null, userName='';
+
+// ═══════════════════════════════════════
+//  VALIDATION
+// ═══════════════════════════════════════
+function setField(inputEl, msgEl, state, text){
+  inputEl.classList.remove('is-error','is-ok');
+  msgEl.classList.remove('err','ok');
+  if(state==='error'){inputEl.classList.add('is-error');msgEl.classList.add('err');}
+  if(state==='ok')   {inputEl.classList.add('is-ok');   msgEl.classList.add('ok');}
+  msgEl.textContent=text||'';
+}
+
+function validateEmail(el){
+  const val=el.value.trim();
+  const msgEl=document.getElementById('msg-email');
+  if(!val){setField(el,msgEl,'','');return false;}
+  // basic format check
+  const atIdx=val.indexOf('@');
+  if(atIdx<1){setField(el,msgEl,'error','Введи коректну email-адресу');return false;}
+  const domain=val.slice(atIdx+1).toLowerCase();
+  if(!ALLOWED_DOMAINS.includes(domain)){
+    setField(el,msgEl,'error',`Підтримуються: ${ALLOWED_DOMAINS.slice(0,5).join(', ')} та інші`);
+    return false;
+  }
+  setField(el,msgEl,'ok','✓ Email виглядає добре');
+  return true;
+}
+
+function passScore(val){
+  let score=0;
+  if(val.length>=8)          score++;
+  if(/[A-ZА-ЯЁЇІЄҐ]/.test(val)) score++;
+  if(/[a-zа-яёїієґ]/.test(val)) score++;
+  if(/[0-9]/.test(val))      score++;
+  if(/[^A-Za-zА-Яа-яёЁЇїІіЄєҐґ0-9]/.test(val)) score++;
+  return score; // 0..5
+}
+
+function validatePass(el){
+  const val=el.value;
+  const msgEl=document.getElementById('msg-pass');
+  const bars=[document.getElementById('bar1'),document.getElementById('bar2'),document.getElementById('bar3'),document.getElementById('bar4')];
+  const lbl=document.getElementById('pass-strength-label');
+
+  if(!val){
+    bars.forEach(b=>b.className='pass-bar');
+    lbl.textContent='';
+    setField(el,msgEl,'','');
+    return false;
+  }
+
+  const score=passScore(val);
+
+  // bars
+  bars.forEach((b,i)=>{
+    b.className='pass-bar';
+    if(score<=2&&i<score)    b.classList.add('weak');
+    else if(score===3&&i<score) b.classList.add('medium');
+    else if(score>=4&&i<score)  b.classList.add('strong');
+  });
+
+  if(score<=1){lbl.textContent='Дуже слабкий';lbl.style.color='var(--error)';}
+  else if(score===2){lbl.textContent='Слабкий';lbl.style.color='var(--error)';}
+  else if(score===3){lbl.textContent='Середній';lbl.style.color='var(--warn)';}
+  else if(score===4){lbl.textContent='Надійний';lbl.style.color='var(--mint)';}
+  else              {lbl.textContent='Відмінний!';lbl.style.color='var(--mint)';}
+
+  if(val.length<8){
+    setField(el,msgEl,'error','Мінімум 8 символів');return false;
+  }
+  if(score<3){
+    setField(el,msgEl,'error','Додай велику літеру, цифру або символ');return false;
+  }
+  setField(el,msgEl,'ok','✓ Пароль надійний');
+  return true;
+}
+
+function onNameInput(val){
+  userName=val;
+  const el=document.getElementById('inp-name');
+  const msgEl=document.getElementById('msg-name');
+  if(val.length===0){setField(el,msgEl,'','');return;}
+  if(val.length<2){setField(el,msgEl,'error','Введи своє справжнє ім\'я');return;}
+  setField(el,msgEl,'ok','');
+  // update bubble if no instrument selected yet
+  if(!selectedInst){
+    setBubble(`Привіт, <strong style="color:var(--mint)">${val}</strong>! 👋<br>Тепер вибери інструмент і рівень — і починаємо!`);
+  }
+}
+
+// ═══════════════════════════════════════
+//  PICKERS
+// ═══════════════════════════════════════
+function selectInst(btn,key){
+  document.querySelectorAll('.inst-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedInst=key;
+  const d=INST_DATA[key];
+  document.getElementById('inst-hint').innerHTML=d.hint;
+  document.getElementById('mascot-img').src=d.mascot;
+  document.getElementById('mascot-name-label').textContent=d.label;
+  setBubble(d.hint+(userName?` Радий познайомитись, <strong style="color:var(--mint)">${userName}</strong>!`:''));
+}
+
+function selectLevel(btn,key){
+  document.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedLevel=key;
+  document.getElementById('level-hint').innerHTML=LEVEL_HINTS[key];
+  if(selectedInst){
+    setBubble(LEVEL_HINTS[key]+(userName?` Чекаю на тебе, <strong style="color:var(--mint)">${userName}</strong>!`:''));
+  }
+}
+
+function setBubble(html){
+  const b=document.getElementById('mascot-bubble');
+  b.style.opacity='0';
+  setTimeout(()=>{b.innerHTML=html;b.style.opacity='1';},320);
+}
+
+// ═══════════════════════════════════════
+//  REGISTER
+// ═══════════════════════════════════════
+function doRegister(){
+  let ok=true;
+
+  // name
+  const nameEl=document.getElementById('inp-name');
+  if(nameEl.value.trim().length<2){
+    setField(nameEl,document.getElementById('msg-name'),'error','Введи своє ім\'я');
+    ok=false;
+  }
+
+  // email
+  const emailEl=document.getElementById('inp-email');
+  if(!validateEmail(emailEl)) ok=false;
+
+  // password
+  const passEl=document.getElementById('inp-pass');
+  if(!validatePass(passEl)) ok=false;
+
+  if(!ok){
+    document.getElementById('submit-btn').classList.add('shake');
+    setTimeout(()=>document.getElementById('submit-btn').classList.remove('shake'),400);
+    setBubble('Схоже, є помилки у формі — перевір виділені поля 👀');
+    return;
+  }
+
+  const user={
+    name: nameEl.value.trim(),
+    email: emailEl.value.trim(),
+    instrument: selectedInst||'guitar',
+    level: selectedLevel||'beginner',
+    joinedAt: new Date().toISOString(),
+    streak: 0,
+    totalMinutes: 0,
+    lessonsCompleted: 0,
+  };
+
+  localStorage.setItem('lofi_user', JSON.stringify(user));
+  localStorage.setItem('lofi_tour_done','1');
+  window.location.href='home.html';
+}
+
+function doLogin(){
+  const email=document.querySelector('#login-form .form-input[type="email"]').value.trim();
+  const pass =document.querySelector('#login-form .form-input[type="password"]').value;
+  if(!email||!pass){
+    setBubble('Введи email та пароль 👀');
+    return;
+  }
+  // Тут буде Firebase Auth — поки що просто переходимо
+  // Якщо є збережений профіль — використовуємо його, інакше базовий
+  const saved=localStorage.getItem('lofi_user');
+  if(saved){
+    window.location.href='home.html';
+  } else {
+    setBubble('Акаунт не знайдено. Спробуй зареєструватись 🙂');
+  }
+}
+
+// ═══════════════════════════════════════
+//  FORM SWITCH
+// ═══════════════════════════════════════
+function switchToLogin(){
+  document.getElementById('register-form').style.display='none';
+  document.getElementById('login-form').style.display='block';
+  document.querySelector('.form-title').innerHTML='З <span class="accent">поверненням</span>';
+  document.querySelector('.form-sub').innerHTML='Немає акаунту? <a href="#" onclick="switchToRegister()">Зареєструватись →</a>';
+  setBubble('З поверненням! 🎵<br>Вводь дані і продовжуємо де зупинились.');
+}
+
+function switchToRegister(){
+  document.getElementById('login-form').style.display='none';
+  document.getElementById('register-form').style.display='block';
+  document.querySelector('.form-title').innerHTML='Створити <span class="accent">профіль</span>';
+  document.querySelector('.form-sub').innerHTML='Вже маєш акаунт? <a href="#" onclick="switchToLogin()">Увійти →</a>';
+  setBubble('Привіт! Я <strong>Каель</strong> 👋<br>Давай створимо твій профіль!');
+}
+
+if(window.location.hash==='#login') switchToLogin();
+</script>
+</body>
+</html>

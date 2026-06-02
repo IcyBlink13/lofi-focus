@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LoFi Focus — Профіль</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
+    --border:rgba(255,255,255,0.07);
+    --mint:#5ee7bf;--mint-glow:rgba(94,231,191,0.12);
+    --blue-soft:#7aa2f7;--lavender:#bb9af7;
+    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+    --streak-hot:#ff9e64;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
+    background-size:44px 44px;}
+  .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 60px;}
+
+  /* NAV */
+  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+  .nav-logo{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);}
+  .nav-logo span{color:var(--text-muted);}
+  .nav-links{display:flex;gap:8px;}
+  .nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;padding:6px 14px;border-radius:8px;transition:background .2s,color .2s;}
+  .nav-links a:hover{background:var(--bg-card2);color:var(--text-main);}
+  .nav-links a.active{color:var(--mint);}
+  .nav-back{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-muted);font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);transition:border-color .2s,color .2s;}
+  .nav-back:hover{border-color:var(--mint);color:var(--mint);}
+
+  /* PROFILE HEADER */
+  .profile-header{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;}
+  .profile-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--mint),transparent);}
+  .avatar-big{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3ab89a,#7aa2f7);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--bg-deep);flex-shrink:0;position:relative;}
+  .avatar-level{position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:var(--bg-card);border:2px solid var(--bg-card);font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .profile-info{}
+  .profile-name{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-bottom:4px;}
+  .profile-email{font-size:13px;color:var(--text-muted);margin-bottom:10px;}
+  .profile-tags{display:flex;gap:8px;flex-wrap:wrap;}
+  .profile-tag{font-size:11px;padding:4px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border);color:var(--text-muted);}
+  .profile-tag.inst{color:var(--mint);border-color:rgba(94,231,191,0.2);background:var(--mint-glow);}
+  .profile-tag.lvl{color:var(--blue-soft);border-color:rgba(122,162,247,0.2);background:rgba(122,162,247,0.08);}
+  .profile-mascot{width:90px;height:110px;object-fit:contain;animation:float 3.5s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-7px) rotate(1deg);}}
+
+  /* STATS ROW */
+  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;transition:border-color .2s;}
+  .stat-card:hover{border-color:rgba(94,231,191,0.2);}
+  .stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+  .stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;}
+  .stat-unit{font-size:12px;font-weight:400;color:var(--text-muted);margin-left:2px;font-family:'DM Sans',sans-serif;}
+  .stat-sub{font-size:11px;color:var(--text-dim);margin-top:4px;}
+
+  /* SECTION */
+  .section-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+
+  /* ACHIEVEMENTS */
+  .ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+  .ach-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s,transform .2s;}
+  .ach-card:hover{border-color:rgba(187,154,247,0.3);transform:translateY(-2px);}
+  .ach-card.locked{opacity:.35;pointer-events:none;}
+  .ach-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
+  .ach-name{font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:3px;}
+  .ach-desc{font-size:11px;color:var(--text-dim);line-height:1.45;}
+  .ach-date{font-size:10px;color:var(--mint);margin-top:5px;font-family:'Space Mono',monospace;}
+
+  /* LEARNING PATH */
+  .path-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin-bottom:24px;}
+  .path-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);}
+  .path-row:last-child{border-bottom:none;padding-bottom:0;}
+  .path-row:first-child{padding-top:0;}
+  .path-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;}
+  .path-label{font-size:12px;color:var(--text-dim);margin-bottom:2px;}
+  .path-value{font-size:14px;font-weight:500;color:var(--text-main);}
+  .path-badge{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;}
+  .path-badge.active{background:var(--mint-glow);color:var(--mint);border:1px solid rgba(94,231,191,0.2);}
+  .path-badge.level{background:rgba(122,162,247,0.1);color:var(--blue-soft);border:1px solid rgba(122,162,247,0.2);}
+
+  /* HEATMAP */
+  .heatmap-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:24px;}
+  .heatmap-grid{display:flex;gap:3px;flex-wrap:wrap;margin-top:12px;}
+  .hm-cell{width:13px;height:13px;border-radius:3px;background:var(--bg-card2);}
+  .hm-cell.l1{background:rgba(94,231,191,0.2);}
+  .hm-cell.l2{background:rgba(94,231,191,0.45);}
+  .hm-cell.l3{background:rgba(94,231,191,0.75);}
+  .hm-cell.l4{background:var(--mint);}
+  .heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text-dim);justify-content:flex-end;}
+  .hm-cell-sm{width:10px;height:10px;border-radius:2px;}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  .profile-header{animation:fadeUp .4s ease both;}
+  .stats-row     {animation:fadeUp .4s .08s ease both;}
+  .ach-grid      {animation:fadeUp .4s .14s ease both;}
+  .path-card     {animation:fadeUp .4s .18s ease both;}
+  .heatmap-card  {animation:fadeUp .4s .22s ease both;}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <nav>
+    <div class="nav-logo">lo<span>.</span>fi<span>·</span>focus</div>
+    <div class="nav-links">
+      <a href="home.html">Головна</a>
+      <a href="lessons.html">Уроки</a>
+      <a href="profile.html" class="active">Профіль</a>
+    </div>
+    <a href="home.html" class="nav-back">← Назад</a>
+  </nav>
+
+  <!-- HEADER -->
+  <div class="profile-header">
+    <div class="avatar-big" id="avatar-big">КП
+      <div class="avatar-level" id="avatar-level">🌱</div>
+    </div>
+    <div class="profile-info">
+      <div class="profile-name" id="profile-name">Ксенія</div>
+      <div class="profile-email" id="profile-email">user@gmail.com</div>
+      <div class="profile-tags">
+        <span class="profile-tag inst" id="tag-inst">🎸 Гітара</span>
+        <span class="profile-tag lvl" id="tag-lvl">🌱 Початківець</span>
+        <span class="profile-tag" id="tag-joined">📅 Приєднався сьогодні</span>
+      </div>
+    </div>
+    <img src="kael_guide.png" class="profile-mascot" id="profile-mascot" alt="Маскот">
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Стрік</div>
+      <div class="stat-value" id="s-streak">0<span class="stat-unit">днів</span></div>
+      <div class="stat-sub">поспіль 🔥</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Практика</div>
+      <div class="stat-value" id="s-minutes">0<span class="stat-unit">хв</span></div>
+      <div class="stat-sub">загалом</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Уроки</div>
+      <div class="stat-value" id="s-lessons">0<span class="stat-unit">з 48</span></div>
+      <div class="stat-sub">пройдено</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Прогрес</div>
+      <div class="stat-value" id="s-pct">0<span class="stat-unit">%</span></div>
+      <div class="stat-sub">курсу</div>
+    </div>
+  </div>
+
+  <!-- LEARNING PATH -->
+  <div class="section-title">Моє навчання</div>
+  <div class="path-card">
+    <div class="path-row">
+      <div class="path-icon">🎸</div>
+      <div>
+        <div class="path-label">Інструмент</div>
+        <div class="path-value" id="path-inst">Гітара</div>
+      </div>
+      <span class="path-badge active" id="path-inst-badge">активний</span>
+    </div>
+    <div class="path-row">
+      <div class="path-icon" id="path-lvl-icon">🌱</div>
+      <div>
+        <div class="path-label">Рівень</div>
+        <div class="path-value" id="path-lvl">Початківець</div>
+      </div>
+      <span class="path-badge level" id="path-lvl-badge">початківець</span>
+    </div>
+    <div class="path-row">
+      <div class="path-icon">📚</div>
+      <div>
+        <div class="path-label">Поточний урок</div>
+        <div class="path-value" id="path-lesson">Ще не розпочато</div>
+      </div>
+    </div>
+    <div class="path-row">
+      <div class="path-icon">🗓️</div>
+      <div>
+        <div class="path-label">На платформі з</div>
+        <div class="path-value" id="path-joined">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="section-title">Досягнення</div>
+  <div class="ach-grid" id="ach-grid"></div>
+
+  <!-- HEATMAP -->
+  <div class="section-title">Активність</div>
+  <div class="heatmap-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;color:var(--text-muted);">Останні 10 тижнів</span>
+      <span style="font-size:12px;color:var(--text-dim);" id="hm-total">0 сесій</span>
+    </div>
+    <div class="heatmap-grid" id="heatmap"></div>
+    <div class="heatmap-legend">
+      <span>Менше</span>
+      <div class="hm-cell hm-cell-sm" style="background:var(--bg-card2)"></div>
+      <div class="hm-cell hm-cell-sm l1"></div>
+      <div class="hm-cell hm-cell-sm l2"></div>
+      <div class="hm-cell hm-cell-sm l3"></div>
+      <div class="hm-cell hm-cell-sm l4"></div>
+      <span>Більше</span>
+    </div>
+  </div>
+
+</div>
+<script>
+const INST_MAP={
+  guitar: {name:'Гітара',   icon:'🎸', mascot:'kael_guitar.jpg', lesson:'Перехід Am → E'},
+  piano:  {name:'Фортепіано',icon:'🎹', mascot:'kael_guide.png',  lesson:'До мажор'},
+  ukulele:{name:'Укулеле',  icon:'🪗', mascot:'kael_guide.png',  lesson:'Перший акорд C'},
+  violin: {name:'Скрипка',  icon:'🎻', mascot:'kael_guide.png',  lesson:'Постановка смичка'},
+  flute:  {name:'Флейта',   icon:'🎵', mascot:'kori_flute.jpg',  lesson:'Перші ноти'},
+  vocal:  {name:'Вокал',    icon:'🎤', mascot:'kori_mic.jpg',    lesson:'Дихальні вправи'},
+};
+const LVL_MAP={
+  beginner:{name:'Початківець',icon:'🌱',badge:'початківець'},
+  middle:  {name:'Середній',   icon:'🎯',badge:'середній'},
+  advanced:{name:'Впевнений',  icon:'🔥',badge:'впевнений'},
+};
+const ALL_ACHIEVEMENTS=[
+  {id:'first',  icon:'🌱', name:'Перший крок',     desc:'Завершено перший урок',              unlock: u=>u.lessonsCompleted>=1},
+  {id:'week',   icon:'🔥', name:'Тиждень поспіль', desc:'7 днів без перерви',                 unlock: u=>u.streak>=7},
+  {id:'focus',  icon:'🎯', name:'Фокус-режим',     desc:'Концентрація >80% за сесію',         unlock: u=>u.lessonsCompleted>=3},
+  {id:'month',  icon:'🏆', name:'30 днів',         desc:'30 днів поспіль',                    unlock: u=>u.streak>=30},
+  {id:'lessons10',icon:'📚',name:'Десятка',        desc:'10 уроків пройдено',                 unlock: u=>u.lessonsCompleted>=10},
+  {id:'hour',   icon:'⏱️', name:'Година практики', desc:'60+ хвилин загальної практики',      unlock: u=>u.totalMinutes>=60},
+];
+
+function initials(name){return (name||'??').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+function formatDate(iso){
+  if(!iso) return '—';
+  const d=new Date(iso);
+  return d.toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'});
+}
+
+window.addEventListener('load',()=>{
+  const raw=localStorage.getItem('lofi_user');
+  if(!raw){window.location.href='index.html';return;}
+  const u=JSON.parse(raw);
+  const inst=INST_MAP[u.instrument||'guitar'];
+  const lvl=LVL_MAP[u.level||'beginner'];
+  const isNew=!u.lessonsCompleted||u.lessonsCompleted===0;
+
+  // header
+  document.getElementById('avatar-big').childNodes[0].textContent=initials(u.name||'??');
+  document.getElementById('avatar-level').textContent=lvl.icon;
+  document.getElementById('profile-name').textContent=u.name||'Учень';
+  document.getElementById('profile-email').textContent=u.email||'—';
+  document.getElementById('tag-inst').textContent=inst.icon+' '+inst.name;
+  document.getElementById('tag-lvl').textContent=lvl.icon+' '+lvl.name;
+  document.getElementById('tag-joined').textContent='📅 '+(u.joinedAt?formatDate(u.joinedAt):'Сьогодні');
+  document.getElementById('profile-mascot').src=inst.mascot;
+
+  // stats
+  document.getElementById('s-streak').innerHTML=(u.streak||0)+'<span class="stat-unit">днів</span>';
+  document.getElementById('s-minutes').innerHTML=(u.totalMinutes||0)+'<span class="stat-unit">хв</span>';
+  document.getElementById('s-lessons').innerHTML=(u.lessonsCompleted||0)+'<span class="stat-unit">з 48</span>';
+  document.getElementById('s-pct').innerHTML=Math.round((u.lessonsCompleted||0)/48*100)+'<span class="stat-unit">%</span>';
+
+  // path
+  document.getElementById('path-inst').textContent=inst.name;
+  document.getElementById('path-inst-badge').textContent=inst.icon+' активний';
+  document.getElementById('path-lvl-icon').textContent=lvl.icon;
+  document.getElementById('path-lvl').textContent=lvl.name;
+  document.getElementById('path-lvl-badge').textContent=lvl.badge;
+  document.getElementById('path-lesson').textContent=isNew?'Ще не розпочато':inst.lesson;
+  document.getElementById('path-joined').textContent=formatDate(u.joinedAt);
+
+  // achievements
+  const grid=document.getElementById('ach-grid');
+  ALL_ACHIEVEMENTS.forEach(a=>{
+    const unlocked=a.unlock(u);
+    const card=document.createElement('div');
+    card.className='ach-card'+(unlocked?'':' locked');
+    card.innerHTML=`
+      <div class="ach-icon">${a.icon}</div>
+      <div>
+        <div class="ach-name">${a.name}</div>
+        <div class="ach-desc">${a.desc}</div>
+        ${unlocked?'<div class="ach-date">✓ Отримано</div>':'<div class="ach-desc" style="margin-top:4px;color:var(--text-dim)">Заблоковано</div>'}
+      </div>`;
+    grid.appendChild(card);
+  });
+
+  // heatmap
+  const hmGrid=document.getElementById('heatmap');
+  const lvls=['','l1','l2','l3','l4'];
+  const pat=isNew
+    ?Array(70).fill(0)
+    :[0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
+  let sessions=0;
+  pat.forEach(v=>{if(v>0)sessions++;});
+  document.getElementById('hm-total').textContent=sessions+' сесій';
+  for(let i=0;i<70;i++){
+    const c=document.createElement('div');
+    c.className='hm-cell'+(pat[i]?' '+lvls[pat[i]]:'');
+    hmGrid.appendChild(c);
+  }
+});
+</script>
+</body>
+</html>
