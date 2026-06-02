@@ -84,6 +84,10 @@
 
   /* FIELD MESSAGE */
   .field-msg{font-size:11px;margin-top:4px;}
+  .pass-wrap{position:relative;}
+  .pass-wrap .setting-input{padding-right:40px;}
+  .eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:15px;padding:0;line-height:1;transition:color .2s;}
+  .eye-btn:hover{color:var(--text-muted);}
   .field-msg.err{color:var(--error);}
   .field-msg.ok{color:var(--mint);}
 
@@ -217,8 +221,14 @@
         <div class="setting-desc">Мінімум 8 символів, велика літера, цифра</div>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
-        <input class="setting-input" type="password" id="inp-pass-old" placeholder="Поточний пароль" style="max-width:360px;">
-        <input class="setting-input" type="password" id="inp-pass-new" placeholder="Новий пароль" oninput="checkNewPass(this)" style="max-width:360px;">
+        <div class="pass-wrap" style="max-width:360px;">
+          <input class="setting-input" type="password" id="inp-pass-old" placeholder="Поточний пароль" style="max-width:360px;width:100%;">
+          <button class="eye-btn" type="button" onclick="togglePass('inp-pass-old',this)">👁</button>
+        </div>
+        <div class="pass-wrap" style="max-width:360px;">
+          <input class="setting-input" type="password" id="inp-pass-new" placeholder="Новий пароль" oninput="checkNewPass(this)" style="max-width:360px;width:100%;">
+          <button class="eye-btn" type="button" onclick="togglePass('inp-pass-new',this)">👁</button>
+        </div>
         <div class="field-msg" id="msg-pass"></div>
         <button class="btn-save" onclick="changePass()" style="align-self:flex-start;">Змінити пароль</button>
       </div>
@@ -549,6 +559,13 @@ window.confirmReset = async function() {
 };
 
 window.logout = function() { logoutUser(); };
+
+window.togglePass = function(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+};
 </script>
 </body>
 </html>
