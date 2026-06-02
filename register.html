@@ -202,7 +202,7 @@
         <button class="eye-btn" type="button" onclick="togglePass('login-pass',this)">👁</button>
       </div>
     </div>
-    <button class="submit-btn" onclick="doLogin()">Увійти →</button>
+    <button class="submit-btn" id="login-submit-btn" onclick="handleLogin()">Увійти →</button>
     <div class="form-divider" style="margin-top:18px;">або</div>
     <div style="text-align:center;font-size:13px;color:var(--text-muted);">Немає акаунту? <a href="#" style="color:var(--mint);text-decoration:none;" onclick="switchToRegister()">Зареєструватись →</a></div>
   </div>
@@ -432,6 +432,19 @@ function switchToRegister(){
 }
 
 if(window.location.hash==='#login') switchToLogin();
+
+// Bridge — викликає Firebase doLogin або fallback
+function handleLogin() {
+  if (typeof window.doLogin === 'function') {
+    window.doLogin();
+  } else {
+    // Firebase ще не завантажився — показати помилку
+    setBubble('Зачекай секунду і спробуй ще раз...');
+    setTimeout(() => {
+      if (typeof window.doLogin === 'function') window.doLogin();
+    }, 1500);
+  }
+}
 
 function togglePass(id, btn) {
   const inp = document.getElementById(id);

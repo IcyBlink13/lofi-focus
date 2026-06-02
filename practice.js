@@ -64,7 +64,7 @@ const LESSONS = {
   drums: {
     beginner: {
       title: 'Барабани — Основний ритм 4/4',
-      videoId: 'KDvfBCCa2kA',
+      videoId: 'K-FBmebCbtQ',
       chords: [
         { name: 'Kick', fingers: ['●','○','○','○'], note: 'Бас-барабан (нога)' },
         { name: 'Snare', fingers: ['○','●','○','●'], note: 'Малий барабан' },
@@ -81,7 +81,7 @@ const LESSONS = {
     },
     middle: {
       title: 'Барабани — Синкопований ритм',
-      videoId: 'KDvfBCCa2kA',
+      videoId: 'K-FBmebCbtQ',
       chords: [
         { name: 'Kick', fingers: ['●','○','●','○','●'], note: 'Подвійний удар' },
         { name: 'Snare', fingers: ['○','●','○','●','○'], note: 'З акцентом' },
@@ -98,7 +98,7 @@ const LESSONS = {
     },
     advanced: {
       title: 'Барабани — Джазові ритми',
-      videoId: 'KDvfBCCa2kA',
+      videoId: 'K-FBmebCbtQ',
       chords: [
         { name: 'Swing', fingers: ['●','○','●','●','○'], note: 'Свінг-патерн' },
         { name: 'Brush', fingers: ['~','~','~','~'], note: 'Щітки по малому' },
@@ -220,6 +220,11 @@ window.addEventListener('load', () => {
 
   // Назва уроку в навбарі
   document.getElementById('nav-lesson-name').textContent = state.lesson.title;
+  // Оновити підпис на відео
+  const vname = document.getElementById('video-lesson-name');
+  const vsub  = document.getElementById('video-lesson-sub');
+  if (vname) vname.textContent = 'Натисни щоб завантажити відео уроку';
+  if (vsub)  vsub.textContent  = 'YouTube · ' + state.lesson.title;
 
   // Рендер акордів
   renderChords();
@@ -281,11 +286,43 @@ function switchTab(tab, btn) {
 
 // ── Відео ──
 function loadVideo() {
-  if (!state.lesson || !state.lesson.videoId) return;
+  if (!state.lesson || !state.lesson.videoId) {
+    window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(state.lesson?.title || 'guitar lesson beginner'), '_blank');
+    return;
+  }
   const wrap = document.getElementById('video-wrap');
+  // Спочатку пробуємо embed
   wrap.innerHTML = `<iframe
-    src="https://www.youtube.com/embed/${state.lesson.videoId}?autoplay=1&rel=0"
-    allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    id="lesson-iframe"
+    src="https://www.youtube.com/embed/${state.lesson.videoId}?autoplay=1&rel=0&modestbranding=1"
+    allow="autoplay; encrypted-media; picture-in-picture"
+    allowfullscreen
+    style="width:100%;height:100%;border:none;display:block;"
+    onerror="openYouTube()"></iframe>`;
+  
+  // Якщо iframe не завантажився за 3 сек — відкрити в новій вкладці
+  setTimeout(() => {
+    const iframe = document.getElementById('lesson-iframe');
+    try {
+      if (!iframe || !iframe.contentDocument) openYouTube();
+    } catch(e) { /* cross-origin — нормально, відео грає */ }
+  }, 3000);
+}
+
+function openYouTube() {
+  if (!state.lesson) return;
+  const wrap = document.getElementById('video-wrap');
+  wrap.innerHTML = \`
+    <div class="video-placeholder" style="gap:16px;">
+      <div style="font-size:36px;">🎬</div>
+      <div style="font-size:14px;color:var(--text-main);font-weight:500;">\${state.lesson.title}</div>
+      <div style="font-size:12px;color:var(--text-muted);">Відео відкриється на YouTube</div>
+      <a href="https://www.youtube.com/embed/\${state.lesson.videoId}?autoplay=1" 
+         target="_blank"
+         style="background:var(--mint);color:var(--bg-deep);font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
+        ▶ Відкрити відео
+      </a>
+    </div>\`;
 }
 
 // ── Вибір тривалості ──
