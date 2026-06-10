@@ -198,18 +198,27 @@ async function findYouTubeVideo(lessonTitle, instrument) {
   // Build search query
   const langQuery = 'урок'; // Ukrainian
   const instMap = {
-    guitar: 'guitar lesson', piano: 'piano lesson',
-    drums: 'drums lesson beginner', flute: 'flute lesson',
-    vocal: 'singing lesson beginner', violin: 'violin lesson',
+    guitar:  'beginner guitar lesson tutorial',
+    piano:   'beginner piano lesson tutorial',
+    drums:   'beginner drums lesson tutorial',
+    flute:   'beginner flute lesson tutorial',
+    vocal:   'beginner singing vocal lesson',
+    violin:  'beginner violin lesson tutorial',
   };
-  const query = `${instMap[instrument] || 'music lesson'} ${lessonTitle}`;
+  // Simple English query works best for YouTube search
+  const query = instMap[instrument] || 'music lesson beginner';
 
   try {
     const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&maxResults=1&key=${YT_API_KEY}`
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=5&relevanceLanguage=uk&key=${YT_API_KEY}`
     );
     const data = await res.json();
+    if (data.error) {
+      console.log('YouTube API error:', data.error.message);
+      return null;
+    }
     if (data.items && data.items.length > 0) {
+      // Повертаємо перший результат
       return data.items[0].id.videoId;
     }
   } catch(e) {
