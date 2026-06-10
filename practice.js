@@ -329,28 +329,49 @@ async function loadVideo() {
   // Показати лоадер
   wrap.innerHTML = `
     <div class="video-placeholder">
-      <div style="font-size:32px;animation:idle-float 1.5s ease-in-out infinite;">🎬</div>
-      <div style="color:var(--text-muted);font-size:13px;">Шукаємо відео для цього уроку...</div>
+      <div style="font-size:32px;">🎬</div>
+      <div style="color:var(--text-muted);font-size:13px;">Шукаємо відео...</div>
     </div>`;
 
-  // Спробуємо знайти відео через YouTube API
+  // Знайти відео через YouTube API
   let videoId = lesson.videoId || null;
-
   if (!videoId) {
     videoId = await findYouTubeVideo(lesson.title, state.instrument);
   }
 
+  const searchUrl = 'https://www.youtube.com/results?search_query=' +
+    encodeURIComponent((lesson.title || '') + ' lesson tutorial');
+
   if (videoId) {
-    // Зберегти знайдений ID для майбутнього використання
     lesson.videoId = videoId;
-    wrap.innerHTML = `<iframe
-      id="lesson-iframe"
-      src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
-      allow="encrypted-media; picture-in-picture"
-      allowfullscreen
-      style="width:100%;height:100%;border:none;display:block;"></iframe>`;
+    // Показуємо iframe + кнопку відкрити на YouTube
+    wrap.innerHTML = `
+      <div style="position:relative;width:100%;height:100%;">
+        <iframe
+          id="lesson-iframe"
+          src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
+          allow="encrypted-media; picture-in-picture"
+          allowfullscreen
+          style="width:100%;height:calc(100% - 40px);border:none;display:block;"></iframe>
+        <div style="height:40px;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;gap:12px;">
+          <span style="font-size:12px;color:var(--text-dim);">Відео не грає?</span>
+          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank"
+             style="font-size:12px;color:var(--mint);text-decoration:none;padding:4px 12px;border:1px solid rgba(94,231,191,0.3);border-radius:6px;">
+            ▶ Відкрити на YouTube
+          </a>
+        </div>
+      </div>`;
   } else {
-    showVideoFallback(lesson);
+    // Якщо API не знайшов — одразу показуємо кнопку пошуку
+    wrap.innerHTML = `
+      <div class="video-placeholder" style="gap:14px;flex-direction:column;">
+        <div style="font-size:40px;">🎬</div>
+        <div style="font-size:14px;color:var(--text-main);font-weight:500;text-align:center;padding:0 16px;">${lesson.title}</div>
+        <a href="${searchUrl}" target="_blank"
+           style="background:var(--mint);color:var(--bg-deep);font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;text-decoration:none;">
+          🔍 Знайти відео на YouTube
+        </a>
+      </div>`;
   }
 }
 
