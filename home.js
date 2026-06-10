@@ -208,8 +208,10 @@ function nextFact() {
 
 // ── Ціль дня ──
 function renderGoal(user) {
-  const goalMins   = user.dailyGoal || 20;
-  const todayMins  = user.todayMinutes || 0;
+  const goalMins  = user.dailyGoal || 20;
+  // Reset todayMinutes if last practice was not today
+  const today = new Date().toDateString();
+  const todayMins = (user.lastPracticeDate === today) ? (Number(user.todayMinutes) || 0) : 0;
   const pct        = Math.min(Math.round(todayMins / goalMins * 100), 100);
   const done       = todayMins >= goalMins;
   const isEvening  = new Date().getHours() >= 19;
@@ -351,12 +353,12 @@ function renderHeatmap(user) {
   const isNew = !user.lessonsCompleted || user.lessonsCompleted === 0;
   const grid  = document.getElementById('heatmap');
   const lvls  = ['','l1','l2','l3','l4'];
-  const pat   = isNew
-    ? Array(70).fill(0)
-    : [0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
+  // Heatmap — реальні дані з localStorage
+  const savedActivity = JSON.parse(localStorage.getItem('lofi_activity') || '[]');
+  const pat = Array(70).fill(0).map((_, i) => savedActivity[i] || 0);
 
   const sessions = pat.filter(v=>v>0).length;
-  document.getElementById('hm-label').textContent = isNew ? 'Ще немає активності' : `${sessions} сесій`;
+  document.getElementById('hm-label').textContent = sessions === 0 ? 'Ще немає активності' : `${sessions} сесій`;
 
   for (let i = 0; i < 70; i++) {
     const c = document.createElement('div');

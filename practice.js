@@ -443,12 +443,21 @@ function finishSession() {
     const user = JSON.parse(raw);
     user.totalMinutes     = (user.totalMinutes     || 0) + mins;
     user.lessonsCompleted = (user.lessonsCompleted || 0) + 1;
+    user.todayMinutes     = (user.todayMinutes     || 0) + mins;
     const today = new Date().toDateString();
     if (user.lastPracticeDate !== today) {
       user.streak = (user.streak || 0) + 1;
       user.lastPracticeDate = today;
+      user.todayMinutes = mins;
     }
     localStorage.setItem('lofi_user', JSON.stringify(user));
+
+    // Оновити heatmap активності
+    const activity = JSON.parse(localStorage.getItem('lofi_activity') || '[]');
+    while (activity.length < 70) activity.unshift(0);
+    // Сьогодні = остання клітинка (індекс 69)
+    activity[69] = Math.min((activity[69] || 0) + 1, 4);
+    localStorage.setItem('lofi_activity', JSON.stringify(activity));
   }
 
   // Показати overlay
