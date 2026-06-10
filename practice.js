@@ -45,7 +45,7 @@ const LESSONS = {
   flute: {
     beginner: {
       title: 'Флейта — Перші ноти',
-      videoId: 'GQMtqKSP1Cg',
+      videoId: 'ZHfZJGugzT4',
       chords: [
         { name: 'Сі', fingers: ['○','●','○','○','○','○'], note: '2-й октава' },
         { name: 'Ля', fingers: ['○','●','●','○','○','○'], note: '2-й октава' },
@@ -64,7 +64,7 @@ const LESSONS = {
   drums: {
     beginner: {
       title: 'Барабани — Основний ритм 4/4',
-      videoId: 'K-FBmebCbtQ',
+      videoId: 'SBVr6y1HzS8',
       chords: [
         { name: 'Kick', fingers: ['●','○','○','○'], note: 'Бас-барабан (нога)' },
         { name: 'Snare', fingers: ['○','●','○','●'], note: 'Малий барабан' },
@@ -81,7 +81,7 @@ const LESSONS = {
     },
     middle: {
       title: 'Барабани — Синкопований ритм',
-      videoId: 'K-FBmebCbtQ',
+      videoId: 'SBVr6y1HzS8',
       chords: [
         { name: 'Kick', fingers: ['●','○','●','○','●'], note: 'Подвійний удар' },
         { name: 'Snare', fingers: ['○','●','○','●','○'], note: 'З акцентом' },
@@ -98,7 +98,7 @@ const LESSONS = {
     },
     advanced: {
       title: 'Барабани — Джазові ритми',
-      videoId: 'K-FBmebCbtQ',
+      videoId: 'SBVr6y1HzS8',
       chords: [
         { name: 'Swing', fingers: ['●','○','●','●','○'], note: 'Свінг-патерн' },
         { name: 'Brush', fingers: ['~','~','~','~'], note: 'Щітки по малому' },
@@ -117,7 +117,7 @@ const LESSONS = {
   vocal: {
     beginner: {
       title: 'Вокал — Дихальні вправи',
-      videoId: 'KDvfBCCa2kA',
+      videoId: 'FmNDWiMQMFs',
       chords: [
         { name: 'До', fingers: ['C4','C5','C6'], note: 'Грудний регістр' },
         { name: 'Соль', fingers: ['G4','G5'], note: 'Змішаний' },
@@ -190,6 +190,33 @@ const state = {
   instrument: 'guitar',
   level: 'beginner',
 };
+
+// ── YouTube API ──
+const YT_API_KEY = 'AIzaSyB6JR1QuxO9OlvyF337a6GXPzJitTVcrOk';
+
+async function findYouTubeVideo(lessonTitle, instrument) {
+  // Build search query
+  const langQuery = 'урок'; // Ukrainian
+  const instMap = {
+    guitar: 'guitar lesson', piano: 'piano lesson',
+    drums: 'drums lesson beginner', flute: 'flute lesson',
+    vocal: 'singing lesson beginner', violin: 'violin lesson',
+  };
+  const query = `${instMap[instrument] || 'music lesson'} ${lessonTitle}`;
+
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&maxResults=1&key=${YT_API_KEY}`
+    );
+    const data = await res.json();
+    if (data.items && data.items.length > 0) {
+      return data.items[0].id.videoId;
+    }
+  } catch(e) {
+    console.log('YouTube API error:', e);
+  }
+  return null;
+}
 
 // ── Init ──
 window.addEventListener('load', () => {
@@ -285,28 +312,55 @@ function switchTab(tab, btn) {
 }
 
 // ── Відео ──
-function loadVideo() {
-  if (!state.lesson || !state.lesson.videoId) {
-    window.open('https://www.youtube.com/results?search_query=' + encodeURIComponent(state.lesson?.title || 'guitar lesson beginner'), '_blank');
-    return;
-  }
+async function loadVideo() {
   const wrap = document.getElementById('video-wrap');
-  // Спочатку пробуємо embed
-  wrap.innerHTML = `<iframe
-    id="lesson-iframe"
-    src="https://www.youtube.com/embed/${state.lesson.videoId}?autoplay=1&rel=0&modestbranding=1"
-    allow="autoplay; encrypted-media; picture-in-picture"
-    allowfullscreen
-    style="width:100%;height:100%;border:none;display:block;"
-    onerror="openYouTube()"></iframe>`;
-  
-  // Якщо iframe не завантажився за 3 сек — відкрити в новій вкладці
-  setTimeout(() => {
-    const iframe = document.getElementById('lesson-iframe');
-    try {
-      if (!iframe || !iframe.contentDocument) openYouTube();
-    } catch(e) { /* cross-origin — нормально, відео грає */ }
-  }, 3000);
+  const lesson = state.lesson;
+  if (!lesson) return;
+
+  // Показати лоадер
+  wrap.innerHTML = `
+    <div class="video-placeholder">
+      <div style="font-size:32px;animation:idle-float 1.5s ease-in-out infinite;">🎬</div>
+      <div style="color:var(--text-muted);font-size:13px;">Шукаємо відео для цього уроку...</div>
+    </div>`;
+
+  // Спробуємо знайти відео через YouTube API
+  let videoId = lesson.videoId || null;
+
+  if (!videoId) {
+    videoId = await findYouTubeVideo(lesson.title, state.instrument);
+  }
+
+  if (videoId) {
+    // Зберегти знайдений ID для майбутнього використання
+    lesson.videoId = videoId;
+    wrap.innerHTML = `<iframe
+      id="lesson-iframe"
+      src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
+      allow="encrypted-media; picture-in-picture"
+      allowfullscreen
+      style="width:100%;height:100%;border:none;display:block;"></iframe>`;
+  } else {
+    showVideoFallback(lesson);
+  }
+}
+
+function showVideoFallback(lesson) {
+  const wrap = document.getElementById('video-wrap');
+  const query = encodeURIComponent((lesson.title || '') + ' урок');
+  const ytSearch = `https://www.youtube.com/results?search_query=${query}`;
+
+  wrap.innerHTML = `
+    <div class="video-placeholder" style="gap:16px;flex-direction:column;">
+      <div style="font-size:40px;">🎬</div>
+      <div style="font-size:15px;color:var(--text-main);font-weight:500;text-align:center;padding:0 20px;">${lesson.title || 'Урок'}</div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;">Відео відкриється на YouTube в новій вкладці</div>
+      <a href="${ytSearch}"
+         target="_blank"
+         style="background:var(--mint);color:var(--bg-deep);font-size:14px;font-weight:600;padding:11px 28px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-top:4px;">
+        ▶ Знайти відео на YouTube
+      </a>
+    </div>`;
 }
 
 function openYouTube() {
