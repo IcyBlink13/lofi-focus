@@ -45,7 +45,7 @@ const LESSONS = {
   flute: {
     beginner: {
       title: 'Флейта — Перші ноти',
-      videoId: 'ZHfZJGugzT4',
+      videoId: 'n_OovhxLPOg',
       chords: [
         { name: 'Сі', fingers: ['○','●','○','○','○','○'], note: '2-й октава' },
         { name: 'Ля', fingers: ['○','●','●','○','○','○'], note: '2-й октава' },
@@ -61,59 +61,7 @@ const LESSONS = {
       ],
     },
   },
-  drums: {
-    beginner: {
-      title: 'Барабани — Основний ритм 4/4',
-      videoId: 'SBVr6y1HzS8',
-      chords: [
-        { name: 'Kick', fingers: ['●','○','○','○'], note: 'Бас-барабан (нога)' },
-        { name: 'Snare', fingers: ['○','●','○','●'], note: 'Малий барабан' },
-        { name: 'Hi-hat', fingers: ['●','●','●','●'], note: 'Хай-хет (рука)' },
-      ],
-      steps: [
-        'Постав ноги на педалі. Права — бас-барабан, ліва — хай-хет.',
-        'Відпрацюй удар по бас-барабану: 1 і 3 долі.',
-        'Додай малий барабан: 2 і 4 долі.',
-        'Правою рукою грай хай-хет на кожну долю.',
-        'Зєднай всі три разом — базовий рок-ритм.',
-        'Зіграй 2 хвилини без зупинки рівно.',
-      ],
-    },
-    middle: {
-      title: 'Барабани — Синкопований ритм',
-      videoId: 'SBVr6y1HzS8',
-      chords: [
-        { name: 'Kick', fingers: ['●','○','●','○','●'], note: 'Подвійний удар' },
-        { name: 'Snare', fingers: ['○','●','○','●','○'], note: 'З акцентом' },
-        { name: 'Ride', fingers: ['●','●','●','●','●'], note: 'Райд замість хай-хету' },
-      ],
-      steps: [
-        'Розігрів — базовий ритм 4/4 на 60 BPM.',
-        'Додай синкопу: удар між 2 і 3 долею.',
-        'Відпрацюй подвійний удар ногою.',
-        'Замін хай-хет на райд.',
-        'Зіграй весь ритм на 80 BPM.',
-        'Додай простий філ на 4-й долі.',
-      ],
-    },
-    advanced: {
-      title: 'Барабани — Джазові ритми',
-      videoId: 'SBVr6y1HzS8',
-      chords: [
-        { name: 'Swing', fingers: ['●','○','●','●','○'], note: 'Свінг-патерн' },
-        { name: 'Brush', fingers: ['~','~','~','~'], note: 'Щітки по малому' },
-        { name: 'Ride', fingers: ['●','○','●','○'], note: 'Джаз на райді' },
-      ],
-      steps: [
-        'Свінг на райді: тріолі з акцентом на 1 і 3.',
-        'Ліва нога — хай-хет на 2 і 4.',
-        'Права нога — спонтанні удари по бас-барабану.',
-        'Мала рука — компінг по малому барабану.',
-        'Зєднай всі чотири кінцівки разом.',
-        'Зіграй 4-тактовий джазовий фрагмент.',
-      ],
-    },
-  },
+
   vocal: {
     beginner: {
       title: 'Вокал — Дихальні вправи',
@@ -256,6 +204,19 @@ window.addEventListener('load', () => {
 
   // Назва уроку в навбарі
   document.getElementById('nav-lesson-name').textContent = state.lesson.title;
+
+  // Оновити підказку акордів залежно від інструменту
+  const chordHint = document.getElementById('chord-hint');
+  if (chordHint) {
+    const hints = {
+      guitar:  'X = не грати · 0 = відкрита струна · цифра = лад',
+      piano:   'Назва ноти · октава · техніка виконання',
+      flute:   'Назва ноти · ● = закритий отвір · ○ = відкритий',
+      vocal:   'Назва ноти · октава · тип регістру',
+      violin:  'Назва ноти · відкрита струна · позиція',
+    };
+    chordHint.textContent = hints[state.instrument] || hints.guitar;
+  }
   // Оновити підпис на відео
   const vname = document.getElementById('video-lesson-name');
   const vsub  = document.getElementById('video-lesson-sub');

@@ -160,7 +160,7 @@
     <div class="inst-grid">
       <button class="inst-btn" onclick="selectInst(this,'guitar')"><span class="inst-em">🎸</span>Гітара</button>
       <button class="inst-btn" onclick="selectInst(this,'piano')"><span class="inst-em">🎹</span>Фортепіано</button>
-      <button class="inst-btn" onclick="selectInst(this,'drums')"><span class="inst-em">🥁</span>Барабани</button>
+      
       <button class="inst-btn" onclick="selectInst(this,'violin')"><span class="inst-em">🎻</span>Скрипка</button>
       <button class="inst-btn" onclick="selectInst(this,'flute')"><span class="inst-em">🎵</span>Флейта</button>
       <button class="inst-btn" onclick="selectInst(this,'vocal')"><span class="inst-em">🎤</span>Вокал</button>
@@ -438,6 +438,18 @@ function switchToRegister(){
 }
 
 if(window.location.hash==='#login') switchToLogin();
+
+// Enter key support
+document.addEventListener('keydown', function(e) {
+  if (e.key !== 'Enter') return;
+  const loginForm = document.getElementById('login-form');
+  const regForm   = document.getElementById('register-form');
+  if (loginForm && loginForm.style.display !== 'none') {
+    window.doLogin && window.doLogin();
+  } else if (regForm && regForm.style.display !== 'none') {
+    window.doRegister && window.doRegister();
+  }
+});
 
 // Bridge
 function handleLogin() {

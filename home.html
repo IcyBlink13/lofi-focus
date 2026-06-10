@@ -1,275 +1,489 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LoFi Focus — Головна</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
-    --border:rgba(255,255,255,0.07);
-    --mint:#5ee7bf;--mint-dim:#3ab89a;--mint-glow:rgba(94,231,191,0.12);
-    --blue-soft:#7aa2f7;--lavender:#bb9af7;
-    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
-    --streak-hot:#ff9e64;--error:#e85d75;
-  }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
-  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
-    background-size:44px 44px;}
-  .page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px;}
-
-  /* ── NAV ── */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);}
-  .nav-logo{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);}
-  .nav-logo span{color:var(--text-muted);}
-  .nav-links{display:flex;gap:8px;align-items:center;}
-  .nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;padding:6px 14px;border-radius:8px;transition:background .2s,color .2s;}
-  .nav-links a:hover{background:var(--bg-card2);color:var(--text-main);}
-  .nav-links a.active{color:var(--mint);}
-  .nav-right{display:flex;align-items:center;gap:10px;}
-  .nav-inst-badge{font-size:12px;color:var(--text-dim);background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:5px 12px;}
-  .nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--mint-dim),var(--blue-soft));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg-deep);cursor:pointer;position:relative;}
-  .nav-avatar-menu{position:absolute;top:42px;right:0;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:8px;width:170px;display:none;z-index:100;box-shadow:0 12px 32px rgba(0,0,0,0.5);}
-  .nav-avatar-menu.open{display:block;}
-  .nav-avatar-menu a{display:block;padding:8px 12px;font-size:13px;color:var(--text-muted);text-decoration:none;border-radius:8px;transition:background .2s,color .2s;}
-  .nav-avatar-menu a:hover{background:var(--bg-card2);color:var(--text-main);}
-  .nav-avatar-menu .logout{color:var(--streak-hot);}
-
-  /* ── HERO ── */
-  .hero{display:grid;grid-template-columns:1fr 300px;gap:32px;padding:36px 0 28px;align-items:start;}
-  .hero-greeting{font-size:12px;color:var(--text-muted);font-weight:500;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;}
-  .hero-name{font-family:'Space Mono',monospace;font-size:32px;font-weight:700;line-height:1.15;margin-bottom:6px;}
-  .hero-name .accent{color:var(--mint);}
-  .hero-subtitle{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6;}
-  .streak-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
-  .streak-badge{display:flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:10px 16px;}
-  .streak-flame{font-size:20px;animation:flicker 2s ease-in-out infinite alternate;}
-  @keyframes flicker{0%{transform:scale(1) rotate(-3deg);}100%{transform:scale(1.1) rotate(3deg);}}
-  .streak-num{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;color:var(--streak-hot);}
-  .streak-label{font-size:12px;color:var(--text-muted);}
-  .quick-btn{display:inline-flex;align-items:center;gap:8px;background:var(--mint);color:var(--bg-deep);font-size:14px;font-weight:600;padding:10px 20px;border-radius:10px;border:none;cursor:pointer;text-decoration:none;transition:opacity .2s,transform .15s;}
-  .quick-btn:hover{opacity:.88;transform:translateY(-1px);}
-
-  /* ── MASCOT PANEL ── */
-  .mascot-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:20px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;position:relative;overflow:hidden;}
-  .mascot-panel::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--mint),transparent);}
-  .mascot-name-tag{font-family:'Space Mono',monospace;font-size:10px;color:var(--mint);letter-spacing:1.5px;text-transform:uppercase;}
-  .mascot-img{width:220px;height:270px;object-fit:contain;animation:idle-float 3.5s ease-in-out infinite;filter:drop-shadow(0 8px 24px rgba(94,231,191,0.15));}
-  @keyframes idle-float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
-  .mascot-bubble{background:var(--bg-card2);border:1px solid var(--border);border-radius:12px;padding:11px 13px;font-size:12.5px;color:var(--text-muted);text-align:center;line-height:1.55;position:relative;transition:opacity .4s;}
-  .mascot-bubble::before{content:'';position:absolute;top:-7px;left:50%;transform:translateX(-50%);border:7px solid transparent;border-bottom-color:var(--bg-card2);border-top:none;}
-
-  /* ── SECTION HEADER ── */
-  .sec-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-  .sec-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;}
-  .sec-link{font-size:12px;color:var(--mint);text-decoration:none;padding:4px 10px;border-radius:6px;border:1px solid rgba(94,231,191,0.2);transition:background .2s;}
-  .sec-link:hover{background:var(--mint-glow);}
-
-  /* ── GOAL OF THE DAY ── */
-  .goal-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:24px;display:flex;align-items:center;gap:20px;}
-  .goal-icon{font-size:32px;flex-shrink:0;}
-  .goal-info{flex:1;}
-  .goal-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
-  .goal-title{font-size:15px;font-weight:500;color:var(--text-main);margin-bottom:10px;}
-  .goal-bar-wrap{background:var(--bg-card2);border-radius:4px;height:5px;overflow:hidden;}
-  .goal-bar{height:100%;border-radius:4px;background:var(--mint);transition:width .6s ease;}
-  .goal-bar.warn{background:var(--streak-hot);}
-  .goal-bar.done{background:var(--mint);}
-  .goal-meta{font-size:11px;color:var(--text-dim);margin-top:6px;}
-  .goal-meta strong{color:var(--mint);}
-  .goal-cta{flex-shrink:0;}
-
-  /* ── MAIN GRID (2 cols) ── */
-  .main-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;}
-
-  /* ── REPEAT BLOCK ── */
-  .repeat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
-  .repeat-empty{font-size:13px;color:var(--text-dim);text-align:center;padding:16px 0;}
-  .repeat-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
-  .repeat-item:last-child{border-bottom:none;padding-bottom:0;}
-  .repeat-item:first-child{padding-top:0;}
-  .repeat-icon{font-size:20px;flex-shrink:0;}
-  .repeat-info{flex:1;}
-  .repeat-title{font-size:13px;font-weight:500;color:var(--text-main);margin-bottom:2px;}
-  .repeat-sub{font-size:11px;color:var(--text-dim);}
-  .repeat-sub.urgent{color:var(--streak-hot);}
-  .repeat-btn{font-size:11px;padding:5px 12px;border-radius:7px;background:var(--mint-glow);border:1px solid rgba(94,231,191,0.25);color:var(--mint);cursor:pointer;text-decoration:none;white-space:nowrap;transition:background .2s;}
-  .repeat-btn:hover{background:rgba(94,231,191,0.2);}
-
-  /* ── WEEK SCHEDULE ── */
-  .week-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;}
-  .week-grid{display:flex;gap:6px;margin-top:4px;}
-  .week-day{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;}
-  .week-day-label{font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.5px;}
-  .week-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;border:2px solid var(--border);}
-  .week-dot.done{background:var(--mint-glow);border-color:var(--mint);color:var(--mint);}
-  .week-dot.today{background:var(--bg-card2);border-color:var(--mint);color:var(--text-main);box-shadow:0 0 0 3px rgba(94,231,191,0.15);}
-  .week-dot.today.done{background:var(--mint);border-color:var(--mint);color:var(--bg-deep);}
-  .week-dot.future{background:var(--bg-card2);border-color:var(--border);color:var(--text-dim);}
-  .week-dot.missed{background:rgba(232,93,117,0.08);border-color:rgba(232,93,117,0.2);color:var(--error);}
-  .week-minutes{font-size:10px;color:var(--text-dim);text-align:center;}
-
-  /* ── LESSONS SECTION ── */
-  .lessons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
-  .lesson-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;cursor:pointer;transition:border-color .2s,transform .2s;text-decoration:none;display:block;position:relative;}
-  .lesson-card:hover{border-color:rgba(94,231,191,0.3);transform:translateY(-2px);}
-  .lesson-card.done::after{content:'✓';position:absolute;top:10px;right:10px;width:18px;height:18px;background:var(--mint);color:var(--bg-deep);border-radius:50%;font-size:10px;font-weight:700;line-height:18px;text-align:center;}
-  .lesson-inst{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
-  .lesson-title{font-size:13px;font-weight:500;color:var(--text-main);margin-bottom:8px;line-height:1.4;}
-  .lesson-meta{display:flex;align-items:center;gap:6px;}
-  .lesson-pill{font-size:10px;padding:2px 8px;border-radius:5px;background:var(--bg-card2);color:var(--text-muted);}
-  .lesson-pill.beginner{color:var(--mint);background:var(--mint-glow);}
-  .lesson-pill.middle{color:var(--blue-soft);background:rgba(122,162,247,0.1);}
-  .lesson-pill.advanced{color:var(--lavender);background:rgba(187,154,247,0.1);}
-  .lesson-time{font-size:10px;color:var(--text-dim);margin-left:auto;}
-
-  /* ── FACT OF THE DAY ── */
-  .fact-card{background:var(--bg-card);border:1px solid rgba(187,154,247,0.2);border-radius:16px;padding:18px 20px;margin-bottom:24px;display:flex;gap:16px;align-items:flex-start;position:relative;overflow:hidden;}
-  .fact-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--lavender),transparent);}
-  .fact-emoji{font-size:28px;flex-shrink:0;margin-top:2px;}
-  .fact-label{font-size:10px;color:var(--lavender);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:6px;font-family:'Space Mono',monospace;}
-  .fact-text{font-size:13.5px;color:var(--text-muted);line-height:1.65;}
-  .fact-text strong{color:var(--text-main);}
-  .fact-next{position:absolute;top:14px;right:16px;font-size:11px;color:var(--text-dim);background:none;border:1px solid var(--border);border-radius:6px;padding:3px 9px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;}
-  .fact-next:hover{border-color:var(--lavender);color:var(--lavender);}
-
-  /* ── HEATMAP ── */
-  .heatmap-section{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:18px 20px;margin-bottom:40px;}
-  .heatmap-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-  .heatmap-grid{display:flex;gap:3px;flex-wrap:wrap;}
-  .hm-cell{width:12px;height:12px;border-radius:2px;background:var(--bg-card2);}
-  .hm-cell.l1{background:rgba(94,231,191,0.2);}
-  .hm-cell.l2{background:rgba(94,231,191,0.45);}
-  .hm-cell.l3{background:rgba(94,231,191,0.75);}
-  .hm-cell.l4{background:var(--mint);}
-
-  footer{border-top:1px solid var(--border);padding:20px 0;text-align:center;font-size:12px;color:var(--text-dim);font-family:'Space Mono',monospace;margin-top:8px;}
-
-  /* ── IDLE MASCOT corner ── */
-  #kael-idle{position:fixed;bottom:24px;right:28px;z-index:500;display:flex;flex-direction:column;align-items:flex-end;gap:6px;}
-  #kael-idle-img{width:76px;object-fit:contain;cursor:pointer;animation:idle-float 3.5s ease-in-out infinite;filter:drop-shadow(0 4px 16px rgba(94,231,191,0.2));transition:transform .2s;}
-  #kael-idle-img:hover{transform:scale(1.1) rotate(4deg) !important;}
-  #kael-idle-bubble{background:var(--bg-card);border:1px solid rgba(94,231,191,0.25);border-radius:12px 12px 4px 12px;padding:9px 12px;font-size:12px;color:var(--text-muted);max-width:200px;text-align:right;line-height:1.5;display:none;}
-  #kael-idle-bubble.show{display:block;animation:fadeUp .3s ease both;}
-
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  .hero{animation:fadeUp .5s ease both;}
-  .goal-card{animation:fadeUp .5s .08s ease both;}
-  .main-grid{animation:fadeUp .5s .14s ease both;}
-  .lessons-grid{animation:fadeUp .5s .18s ease both;}
-  .fact-card{animation:fadeUp .5s .22s ease both;}
-  .heatmap-section{animation:fadeUp .5s .26s ease both;}
-</style>
-</head>
-<body>
-
-<!-- IDLE MASCOT -->
-<div id="kael-idle">
-  <div id="kael-idle-bubble"></div>
-  <img src="kael_guide.png" id="kael-idle-img" alt="Маскот" onclick="toggleIdleBubble()">
-</div>
-
-<div class="page">
-  <nav>
-    <div class="nav-logo">lo<span>.</span>fi<span>·</span>focus</div>
-    <div class="nav-links">
-      <a href="home.html" class="active">Головна</a>
-      <a href="lessons.html">Уроки</a>
-      <a href="progress.html">Прогрес</a>
-      <a href="notes.html">Нотатки</a>
-    </div>
-    <div class="nav-right">
-      <div class="nav-inst-badge" id="nav-inst-badge">🎸 Гітара</div>
-      <div class="nav-avatar" id="nav-avatar" onclick="toggleMenu(event)">
-        <span id="nav-initials">??</span>
-        <div class="nav-avatar-menu" id="nav-menu">
-          <a href="profile.html">👤 Профіль</a>
-          <a href="settings.html">⚙️ Налаштування</a>
-          <a href="notes.html">📝 Нотатки</a>
-          <a href="index.html" class="logout" onclick="logout()">🚪 Вийти</a>
+/ ═══════════════════════════════════════════════
+//  lo.fi·focus — home.js  (повна версія)
+// ═══════════════════════════════════════════════
+ 
+// ── Інструменти ──
+const INST_MAP = {
+  guitar:  { label:'Каель · гітара',  mascot:'kael_guitar.jpg', badge:'🎸 Гітара',     lastLesson:'Гітара — Перехід Am → E' },
+  piano:   { label:'Корі · фортепіано', mascot:'kori_piano.png', badge:'🎹 Фортепіано', lastLesson:'Фортепіано — До мажор' },
+  drums: { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🥁 Барабани',    lastLesson:'Барабани — Перший акорд C' },
+  violin:  { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🎻 Скрипка',    lastLesson:'Скрипка — Постановка смичка' },
+  flute:   { label:'Корі · флейта',   mascot:'kori_flute.jpg',  badge:'🎵 Флейта',     lastLesson:'Флейта — Перші ноти' },
+  vocal:   { label:'Корі · вокал',    mascot:'kori_mic.jpg',    badge:'🎤 Вокал',      lastLesson:'Вокал — Дихальні вправи' },
+};
+ 
+// ── Уроки для рекомендацій ──
+const LESSONS_DB = {
+  guitar: {
+    beginner: [
+      { title:'Як тримати гітару і ставити руки', time:10, lvl:'beginner' },
+      { title:'Перший акорд — Am',                time:12, lvl:'beginner' },
+      { title:'Перший акорд — E мажор',           time:12, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Баре на 1 ладу — акорд F',         time:20, lvl:'middle' },
+      { title:'Прогресія Am → F → C → G',         time:18, lvl:'middle' },
+      { title:'Fingerpicking — базовий паттерн',  time:20, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Легато — хаммер-он та пул-оф',     time:22, lvl:'advanced' },
+      { title:'Імпровізація в пентатоніці',        time:25, lvl:'advanced' },
+      { title:'Техніка арпеджіо',                 time:20, lvl:'advanced' },
+    ],
+  },
+  flute: {
+    beginner: [
+      { title:'Постановка амбушюра',              time:12, lvl:'beginner' },
+      { title:'Ноти Сі, Ля, Соль',               time:15, lvl:'beginner' },
+      { title:'Перша мелодія',                    time:18, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Вібрато на флейті',                time:20, lvl:'middle' },
+      { title:'Гами у другому октаві',            time:18, lvl:'middle' },
+      { title:'Артикуляція — легато та стакато',  time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Складні ритмічні паттерни',        time:25, lvl:'advanced' },
+      { title:'Сучасна техніка флейти',           time:22, lvl:'advanced' },
+      { title:'Мультифоніка',                     time:28, lvl:'advanced' },
+    ],
+  },
+  drums: {
+    beginner: [
+      { title:'Основний ритм 4/4 — перший крок', time:12, lvl:'beginner' },
+      { title:'Хват паличок та постановка рук',  time:10, lvl:'beginner' },
+      { title:'Бас-барабан + малий — базовий рок', time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Синкопований ритм',               time:18, lvl:'middle' },
+      { title:'Подвійний удар ногою',             time:20, lvl:'middle' },
+      { title:'Філи та заповнювачі',              time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Джазовий свінг-патерн',            time:22, lvl:'advanced' },
+      { title:'Поліритмія — 3 проти 4',           time:25, lvl:'advanced' },
+      { title:'Імпровізація соло на барабанах',   time:28, lvl:'advanced' },
+    ],
+  },
+  vocal: {
+    beginner: [
+      { title:'Дихання діафрагмою',               time:12, lvl:'beginner' },
+      { title:'Розспівка — терції та кварти',     time:15, lvl:'beginner' },
+      { title:'Резонатори голосу',                time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Мікрофонна техніка',               time:18, lvl:'middle' },
+      { title:'Розширення діапазону',             time:20, lvl:'middle' },
+      { title:'Робота з емоцією у співі',         time:18, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Мелізми та прикраси',              time:22, lvl:'advanced' },
+      { title:'Змішаний регістр',                 time:20, lvl:'advanced' },
+      { title:'Запис голосу — основи',            time:25, lvl:'advanced' },
+    ],
+  },
+  piano: {
+    beginner: [
+      { title:'Позиція рук і перші ноти',         time:12, lvl:'beginner' },
+      { title:'Гама До мажор',                    time:15, lvl:'beginner' },
+      { title:'Прості мелодії',                   time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Дві руки разом — координація',     time:20, lvl:'middle' },
+      { title:'Педаль — де і коли',               time:18, lvl:'middle' },
+      { title:'Акордові прогресії',               time:22, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Арпеджіо та інверсії акордів',     time:25, lvl:'advanced' },
+      { title:'Поліритмія',                       time:28, lvl:'advanced' },
+      { title:'Етюди Черні',                      time:30, lvl:'advanced' },
+    ],
+  },
+  drums: {
+    beginner: [
+      { title:'Налаштування барабани',             time:10, lvl:'beginner' },
+      { title:'Хват паличок та постановка рук',          time:12, lvl:'beginner' },
+      { title:'Базовий рок-ритм',                      time:15, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Фінгерпікінг для барабани',         time:18, lvl:'middle' },
+      { title:'Баре на барабани',                  time:20, lvl:'middle' },
+      { title:'Робота з хай-хетом',                 time:16, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Подвійні удари ногою',        time:22, lvl:'advanced' },
+      { title:'Фламенко-стиль для барабани',       time:25, lvl:'advanced' },
+      { title:'Імпровізація на барабанах',                 time:28, lvl:'advanced' },
+    ],
+  },
+  violin: {
+    beginner: [
+      { title:'Постановка смичка і руки',         time:12, lvl:'beginner' },
+      { title:'Перші ноти — відкриті струни',     time:15, lvl:'beginner' },
+      { title:'Гама Ре мажор',                    time:18, lvl:'beginner' },
+    ],
+    middle: [
+      { title:'Зміна позицій',                    time:20, lvl:'middle' },
+      { title:'Деташе та легато',                 time:18, lvl:'middle' },
+      { title:'Подвійні ноти',                    time:22, lvl:'middle' },
+    ],
+    advanced: [
+      { title:'Вібрато',                          time:25, lvl:'advanced' },
+      { title:'Позиція III',                      time:22, lvl:'advanced' },
+      { title:'Флажолети',                        time:28, lvl:'advanced' },
+    ],
+  },
+};
+ 
+// ── Факти дня ──
+const FACTS = [
+  { emoji:'🎸', text:'<strong>Гітара має близько 300 років</strong> сучасної форми. Але попередники існували ще в Стародавньому Єгипті — понад 3500 років тому.' },
+  { emoji:'🎵', text:'Людина <strong>починає реагувати на музику</strong> ще у животі матері — приблизно з 16-го тижня вагітності.' },
+  { emoji:'🧠', text:'Гра на музичному інструменті <strong>тренує обидві півкулі</strong> мозку одночасно — це одне з найскладніших завдань для нейронів.' },
+  { emoji:'🎹', text:'<strong>Фортепіано має 88 клавіш</strong>, але людський слух сприймає лише близько 10 октав — і піаніно покриває майже всі з них.' },
+  { emoji:'🔥', text:'<strong>10 000 годин</strong> практики — саме стільки потрібно, щоб стати справжнім експертом у будь-якій справі. 15 хвилин на день = 10 000 годин за 109 років. Але майстерність настає набагато раніше!' },
+  { emoji:'🎻', text:'Скрипки Страдіварі <strong>звучать краще після 300 років</strong>. Вчені досі не можуть точно пояснити чому — деревина, лак, форма — загадка.' },
+  { emoji:'🌊', text:'Музика у темпі <strong>60 ударів на хвилину</strong> синхронізується з серцевим ритмом і допомагає вчитися — саме тому lo-fi так добре підходить для навчання.' },
+  { emoji:'🎤', text:'Людський голос — <strong>єдиний музичний інструмент</strong>, який є у кожного від народження. І як будь-який інструмент — він потребує тренування.' },
+  { emoji:'🥁', text:'Барабани прийшло до Гаваїв з <strong>Португалії у 1879 році</strong>. Назва означає «стрибаюча блоха» — через швидкі рухи пальців.' },
+  { emoji:'🎵', text:'Практика <strong>у повільному темпі</strong> ефективніша за швидку. М\'язова пам\'ять формується точніше, коли мозок встигає обробити кожен рух.' },
+  { emoji:'🌙', text:'Lo-fi музика <strong>знижує рівень кортизолу</strong> (гормону стресу) і підвищує концентрацію — саме тому ми обрали такий стиль для платформи.' },
+  { emoji:'🎸', text:'Джимі Хендрікс був <strong>лівшею</strong> і грав на правій гітарі, перевернутій навиворіт. Це дало йому унікальний звук, який ніхто не міг відтворити.' },
+];
+ 
+// ── Фрази маскота ──
+const BUBBLES_KAEL = [
+  'Не забудь розім\'яти пальці перед практикою 🤙',
+  'Короткі сесії щодня — краще ніж годину раз на тиждень 🎵',
+  'Пам\'ятаєш той важкий перехід? Сьогодні він дасться легше! 💪',
+  'Зроби хоча б 15 хвилин — стрік не зламається! 🔥',
+];
+const BUBBLES_KORI = [
+  'Привіт! Сьогодні пограємо разом? 🎵',
+  'Дихання — основа всього. Не поспішай 🌬️',
+  'Голос — теж інструмент. Розспівайся перед заняттям 🎤',
+  'Ти справляєшся! Кожен день кращий за попередній ✨',
+];
+const BUBBLES_NEW = [
+  text => `Вітаю, <strong style="color:var(--mint)">${text}</strong>! 🎉 Починаємо разом — це буде круто!`,
+  text => `Привіт, <strong style="color:var(--mint)">${text}</strong>! Я буду поруч на кожному кроці 😄`,
+];
+ 
+// ── Утиліти ──
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h < 6)  return 'Добраніч';
+  if (h < 12) return 'Доброго ранку';
+  if (h < 18) return 'Добрий день';
+  return 'Добрий вечір';
+}
+function initials(name) {
+  return (name||'??').trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+}
+function levelLabel(lvl) {
+  return lvl==='beginner'?'Початківець':lvl==='middle'?'Середній':'Впевнений';
+}
+function levelCls(lvl) { return lvl||'beginner'; }
+function daysSince(isoDate) {
+  if (!isoDate) return 999;
+  return Math.floor((Date.now() - new Date(isoDate)) / 86400000);
+}
+function randomFrom(arr) { return arr[Math.floor(Math.random()*arr.length)]; }
+ 
+// ── Факт дня ──
+let factIdx = parseInt(localStorage.getItem('lofi_fact_idx') || '0');
+function renderFact() {
+  const f = FACTS[factIdx % FACTS.length];
+  document.getElementById('fact-emoji').textContent = f.emoji;
+  document.getElementById('fact-text').innerHTML    = f.text;
+}
+function nextFact() {
+  factIdx = (factIdx + 1) % FACTS.length;
+  localStorage.setItem('lofi_fact_idx', factIdx);
+  const fc = document.getElementById('fact-card');
+  fc.style.opacity = '0';
+  fc.style.transition = 'opacity .3s';
+  setTimeout(() => { renderFact(); fc.style.opacity = '1'; }, 300);
+}
+ 
+// ── Ціль дня ──
+function renderGoal(user) {
+  const goalMins   = user.dailyGoal || 20;
+  const todayMins  = user.todayMinutes || 0;
+  const pct        = Math.min(Math.round(todayMins / goalMins * 100), 100);
+  const done       = todayMins >= goalMins;
+  const isEvening  = new Date().getHours() >= 19;
+  const streakRisk = !done && isEvening;
+ 
+  const barCls  = done ? 'done' : streakRisk ? 'warn' : '';
+  const meta    = done
+    ? `✓ Ціль виконана! Молодець 🎉`
+    : streakRisk
+      ? `⚠️ Вечір, а ціль ще не виконана — стрік під загрозою!`
+      : `${todayMins} з ${goalMins} хвилин сьогодні`;
+ 
+  document.getElementById('goal-section').innerHTML = `
+    <div class="goal-card" style="margin-bottom:24px;">
+      <div class="goal-icon">${done ? '🏆' : streakRisk ? '⚠️' : '🎯'}</div>
+      <div class="goal-info">
+        <div class="goal-label">Ціль дня</div>
+        <div class="goal-title">${done ? 'Сьогоднішня ціль виконана!' : `Зіграй ${goalMins} хвилин сьогодні`}</div>
+        <div class="goal-bar-wrap">
+          <div class="goal-bar ${barCls}" style="width:${pct}%"></div>
         </div>
+        <div class="goal-meta">${meta}</div>
       </div>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-left">
-      <div class="hero-greeting" id="hero-greeting">Добрий вечір</div>
-      <div class="hero-name">Привіт, <span class="accent" id="hero-name"></span> 👋</div>
-      <div class="hero-subtitle" id="hero-subtitle">Завантаження...</div>
-      <div class="streak-row" id="streak-row">
-        <div class="streak-badge">
-          <span class="streak-flame">🔥</span>
-          <span class="streak-num" id="streak-num">0</span>
-          <span class="streak-label">днів поспіль</span>
-        </div>
-        <a href="practice.html" class="quick-btn" id="quick-btn">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
-          Продовжити урок
+      <div class="goal-cta">
+        <a href="practice.html" class="quick-btn" style="font-size:13px;padding:8px 16px;">
+          ${done ? '▶ Ще одна сесія' : '▶ Почати'}
         </a>
       </div>
-    </div>
-    <div class="mascot-panel">
-      <div class="mascot-name-tag" id="mascot-name-tag">Каель · ваш гід</div>
-      <img src="kael_guide.png" class="mascot-img" id="mascot-img" alt="Маскот" onerror="this.src='kael_guide.png'">
-      <div class="mascot-bubble" id="mascot-bubble">Завантаження...</div>
-    </div>
-  </div>
-
-  <!-- ЦІЛЬ ДНЯ -->
-  <div id="goal-section"></div>
-
-  <!-- ПОВТОРИ + РОЗКЛАД -->
-  <div class="main-grid">
-    <div class="repeat-card">
-      <div class="sec-header">
-        <div class="sec-title">🔁 Повтори</div>
-        <a href="lessons.html" class="sec-link">Всі уроки →</a>
+    </div>`;
+ 
+  // Маскот реагує на ризик стріку
+  if (streakRisk) {
+    setTimeout(() => {
+      setBubble('Стрік під загрозою! Ще є час — навіть 5 хвилин рятують 🔥');
+    }, 2000);
+  }
+}
+ 
+// ── Повтори ──
+function renderRepeats(user, inst) {
+  const container = document.getElementById('repeat-list');
+  const completedLessons = user.completedLessons || [];
+ 
+  // Якщо немає пройдених — показати заглушку
+  if (completedLessons.length === 0) {
+    container.innerHTML = `<div class="repeat-empty">
+      Пройди кілька уроків — і тут з'являться нагадування повторити їх 🌱
+    </div>`;
+    return;
+  }
+ 
+  // Знайти уроки що пройшли 3+ дні тому
+  const toRepeat = completedLessons
+    .filter(l => daysSince(l.completedAt) >= 3)
+    .slice(0, 3);
+ 
+  if (toRepeat.length === 0) {
+    container.innerHTML = `<div class="repeat-empty">
+      Все свіже! Повторення з'являться через кілька днів після уроку 👍
+    </div>`;
+    return;
+  }
+ 
+  container.innerHTML = toRepeat.map(l => {
+    const days = daysSince(l.completedAt);
+    const urgent = days >= 7;
+    return `
+      <div class="repeat-item">
+        <div class="repeat-icon">${inst.badge.split(' ')[0]}</div>
+        <div class="repeat-info">
+          <div class="repeat-title">${l.title}</div>
+          <div class="repeat-sub ${urgent ? 'urgent' : ''}">
+            ${urgent ? `⚠️ ${days} днів без повторення` : `${days} дні тому`}
+          </div>
+        </div>
+        <a href="practice.html" class="repeat-btn">Повторити</a>
+      </div>`;
+  }).join('');
+}
+ 
+// ── Розклад тижня ──
+function renderWeek(user) {
+  const days    = ['Пн','Вт','Ср','Чт','Пт','Сб','Нд'];
+  const today   = new Date().getDay(); // 0=Нд
+  const todayIdx = today === 0 ? 6 : today - 1; // 0=Пн
+  const weekData = user.weekActivity || Array(7).fill(0); // хвилин per day
+ 
+  let doneDays = 0;
+  const grid = document.getElementById('week-grid');
+  grid.innerHTML = days.map((d, i) => {
+    const mins    = weekData[i] || 0;
+    const isPast  = i < todayIdx;
+    const isToday = i === todayIdx;
+    const isFuture = i > todayIdx;
+    const hasPractice = mins > 0;
+    const missed  = isPast && !hasPractice;
+ 
+    if (hasPractice) doneDays++;
+ 
+    let cls = '';
+    if (isToday)          cls = hasPractice ? 'today done' : 'today';
+    else if (hasPractice) cls = 'done';
+    else if (missed)      cls = 'missed';
+    else                  cls = 'future';
+ 
+    return `
+      <div class="week-day">
+        <div class="week-day-label">${d}</div>
+        <div class="week-dot ${cls}">${hasPractice ? '✓' : isToday ? '·' : ''}</div>
+        <div class="week-minutes">${mins > 0 ? mins+'хв' : ''}</div>
+      </div>`;
+  }).join('');
+ 
+  document.getElementById('week-summary').textContent = `${doneDays} з 7 днів`;
+}
+ 
+// ── Уроки ──
+function renderLessons(user, inst) {
+  const instrument = user.instrument || 'guitar';
+  const level      = user.level      || 'beginner';
+  const isNew      = !user.lessonsCompleted || user.lessonsCompleted === 0;
+  const pool       = (LESSONS_DB[instrument] || LESSONS_DB.guitar)[level] || [];
+  const lessons    = pool.slice(0, 3);
+ 
+  document.getElementById('lessons-section').innerHTML = lessons.map((l, i) => `
+    <a href="practice.html" class="lesson-card${isNew && i===0 ? '' : ''}">
+      ${isNew && i === 0 ? '<div style="font-size:10px;color:var(--mint);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px;">⭐ Починай звідси</div>' : ''}
+      <div class="lesson-inst">${inst.badge}</div>
+      <div class="lesson-title">${l.title}</div>
+      <div class="lesson-meta">
+        <span class="lesson-pill ${levelCls(l.lvl)}">${levelLabel(l.lvl)}</span>
+        <span class="lesson-time">⏱ ${l.time} хв</span>
       </div>
-      <div id="repeat-list"></div>
-    </div>
-    <div class="week-card">
-      <div class="sec-header">
-        <div class="sec-title">📅 Цей тиждень</div>
-        <span id="week-summary" style="font-size:11px;color:var(--text-dim);"></span>
+    </a>`).join('');
+}
+ 
+// ── Heatmap ──
+function renderHeatmap(user) {
+  const isNew = !user.lessonsCompleted || user.lessonsCompleted === 0;
+  const grid  = document.getElementById('heatmap');
+  const lvls  = ['','l1','l2','l3','l4'];
+  const pat   = isNew
+    ? Array(70).fill(0)
+    : [0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
+ 
+  const sessions = pat.filter(v=>v>0).length;
+  document.getElementById('hm-label').textContent = isNew ? 'Ще немає активності' : `${sessions} сесій`;
+ 
+  for (let i = 0; i < 70; i++) {
+    const c = document.createElement('div');
+    c.className = 'hm-cell' + (pat[i] ? ' '+lvls[pat[i]] : '');
+    grid.appendChild(c);
+  }
+}
+ 
+// ── Bubble ──
+function setBubble(html) {
+  const b = document.getElementById('mascot-bubble');
+  b.style.opacity = '0';
+  b.style.transition = 'opacity .4s';
+  setTimeout(() => { b.innerHTML = html; b.style.opacity = '1'; }, 350);
+}
+ 
+// ── INIT ──
+window.addEventListener('load', () => {
+  const raw = localStorage.getItem('lofi_user');
+  if (!raw) { window.location.href = 'index.html'; return; }
+  // Extra safety - don't redirect if we have valid user data
+  try { JSON.parse(raw); } catch(e) { window.location.href = 'index.html'; return; }
+ 
+  const user   = JSON.parse(raw);
+  const inst   = INST_MAP[user.instrument] || INST_MAP.guitar;
+  const isNew  = !user.lessonsCompleted || Number(user.lessonsCompleted) === 0;
+  const name   = (user.name && user.name.trim()) || 'Учень';
+  const isKori = ['flute','vocal','piano'].includes(user.instrument);
+ 
+  // Greeting
+  document.getElementById('hero-greeting').textContent       = getGreeting();
+  document.getElementById('hero-name').textContent           = name;
+  document.getElementById('nav-inst-badge').textContent      = inst.badge;
+  document.getElementById('nav-initials').textContent        = initials(name);
+  document.getElementById('mascot-img').src                  = inst.mascot;
+  document.getElementById('mascot-name-tag').textContent     = inst.label;
+  document.getElementById('kael-idle-img').src               = inst.mascot;
+  document.getElementById('mascot-img').onerror              = function(){ this.src='kael_guide.png'; };
+  document.getElementById('kael-idle-img').onerror           = function(){ this.src='kael_guide.png'; };
+ 
+  // Hero subtitle + streak
+  if (isNew) {
+    document.getElementById('hero-subtitle').textContent = 'Раді бачити тебе! Обери перший урок і починай 🎵';
+    document.getElementById('streak-row').innerHTML = `
+      <div class="streak-badge">
+        <span>🌱</span>
+        <span style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);">День 1</span>
+        <span style="font-size:12px;color:var(--text-muted);">перший день — найважливіший</span>
       </div>
-      <div class="week-grid" id="week-grid"></div>
-    </div>
-  </div>
-
-  <!-- УРОКИ -->
-  <div class="sec-header">
-    <div class="sec-title">🎵 Рекомендовані уроки</div>
-    <a href="lessons.html" class="sec-link">Каталог →</a>
-  </div>
-  <div class="lessons-grid" id="lessons-section"></div>
-
-  <!-- ФАКТ ДНЯ -->
-  <div class="fact-card" id="fact-card">
-    <div class="fact-emoji" id="fact-emoji">🎵</div>
-    <div>
-      <div class="fact-label">Знаєш що?</div>
-      <div class="fact-text" id="fact-text">Завантаження...</div>
-    </div>
-    <button class="fact-next" onclick="nextFact()">Ще →</button>
-  </div>
-
-  <!-- HEATMAP -->
-  <div class="heatmap-section">
-    <div class="heatmap-header">
-      <span style="font-size:13px;color:var(--text-muted);">Активність за 10 тижнів</span>
-      <span style="font-size:11px;color:var(--text-dim);" id="hm-label"></span>
-    </div>
-    <div class="heatmap-grid" id="heatmap"></div>
-  </div>
-
-  <footer>lo.fi·focus · v0.1 · зроблено з ♥ для музикантів</footer>
-</div>
-
-<script src="home.js"></script>
-</body>
-</html>
+      <a href="practice.html" class="quick-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+        Почати перший урок
+      </a>`;
+    setBubble(BUBBLES_NEW[0](name));
+  } else {
+    document.getElementById('hero-subtitle').innerHTML =
+      `Останній урок: <strong style="color:var(--text-main)">${inst.lastLesson}</strong><br>Продовжимо де зупинились?`;
+    document.getElementById('streak-num').textContent = Number(user.streak) || 0;
+ 
+    // Bubble rotation
+    const bubbles = isKori ? BUBBLES_KORI : BUBBLES_KAEL;
+    let pi = 0;
+    setBubble(bubbles[0]);
+    setInterval(() => {
+      pi = (pi+1) % bubbles.length;
+      setBubble(bubbles[pi]);
+    }, 6000);
+  }
+ 
+  // Ціль дня
+  renderGoal(user);
+ 
+  // Повтори
+  renderRepeats(user, inst);
+ 
+  // Розклад тижня
+  renderWeek(user);
+ 
+  // Уроки
+  renderLessons(user, inst);
+ 
+  // Факт дня — новий факт щодня
+  const today = new Date().toDateString();
+  if (localStorage.getItem('lofi_fact_date') !== today) {
+    factIdx = Math.floor(Math.random() * FACTS.length);
+    localStorage.setItem('lofi_fact_idx',  factIdx);
+    localStorage.setItem('lofi_fact_date', today);
+  }
+  renderFact();
+ 
+  // Heatmap
+  renderHeatmap(user);
+});
+ 
+// ── Меню ──
+function toggleMenu(e) {
+  e.stopPropagation();
+  document.getElementById('nav-menu').classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  const m = document.getElementById('nav-menu');
+  if (m) m.classList.remove('open');
+});
+ 
+// ── Idle маскот ──
+const IDLE_PHRASES = [
+  'Натисни «Почати» — я чекаю! 🎸',
+  '15 хвилин щодня — і за місяць не впізнаєш себе 🎵',
+  'Зіграй хоча б одну гаму — це вже практика! 🌱',
+  'Перевір нотатки з останньої практики 📝',
+];
+let bubbleTimeout;
+function toggleIdleBubble() {
+  const b = document.getElementById('kael-idle-bubble');
+  if (b.classList.contains('show')) {
+    b.classList.remove('show');
+  } else {
+    b.innerHTML = randomFrom(IDLE_PHRASES);
+    b.classList.add('show');
+    clearTimeout(bubbleTimeout);
+    bubbleTimeout = setTimeout(() => b.classList.remove('show'), 4500);
+  }
+}
+ 
+// ── Вихід ──
+function logout() {
+  localStorage.removeItem('lofi_user');
+  localStorage.removeItem('lofi_tour_done');
+}
+ 

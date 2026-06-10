@@ -1,312 +1,571 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk" data-theme="dark">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LoFi Focus — Профіль</title>
+<title>LoFi Focus — Налаштування</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
-    --border:rgba(255,255,255,0.07);
+    --border:rgba(255,255,255,0.07);--border-focus:rgba(94,231,191,0.4);
     --mint:#5ee7bf;--mint-glow:rgba(94,231,191,0.12);
     --blue-soft:#7aa2f7;--lavender:#bb9af7;
     --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+    --error:#e85d75;--error-bg:rgba(232,93,117,0.08);
     --streak-hot:#ff9e64;
   }
+  [data-theme="light"]{
+    --bg-deep:#f4f6f9;--bg-card:#ffffff;--bg-card2:#eef0f4;
+    --border:rgba(0,0,0,0.08);--border-focus:rgba(56,189,166,0.5);
+    --mint:#2baa87;--mint-glow:rgba(43,170,135,0.1);
+    --text-main:#1a1f2e;--text-muted:#5a6275;--text-dim:#9ba3b2;
+  }
   *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;}
+  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;transition:background .3s,color .3s;}
   body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
+    background-image:linear-gradient(rgba(94,231,191,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.02) 1px,transparent 1px);
     background-size:44px 44px;}
-  .page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:0 24px 60px;}
+  .page{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:0 24px 60px;}
 
   /* NAV */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);margin-bottom:40px;}
+  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);margin-bottom:36px;}
   .nav-logo{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);}
   .nav-logo span{color:var(--text-muted);}
-  .nav-links{display:flex;gap:8px;}
-  .nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;padding:6px 14px;border-radius:8px;transition:background .2s,color .2s;}
-  .nav-links a:hover{background:var(--bg-card2);color:var(--text-main);}
-  .nav-links a.active{color:var(--mint);}
   .nav-back{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--text-muted);font-size:13px;padding:6px 12px;border-radius:8px;border:1px solid var(--border);transition:border-color .2s,color .2s;}
   .nav-back:hover{border-color:var(--mint);color:var(--mint);}
 
-  /* PROFILE HEADER */
-  .profile-header{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:28px 32px;margin-bottom:24px;position:relative;overflow:hidden;}
-  .profile-header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--mint),transparent);}
-  .avatar-big{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#3ab89a,#7aa2f7);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:var(--bg-deep);flex-shrink:0;position:relative;}
-  .avatar-level{position:absolute;bottom:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:var(--bg-card);border:2px solid var(--bg-card);font-size:13px;display:flex;align-items:center;justify-content:center;}
-  .profile-info{}
-  .profile-name{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-bottom:4px;}
-  .profile-email{font-size:13px;color:var(--text-muted);margin-bottom:10px;}
-  .profile-tags{display:flex;gap:8px;flex-wrap:wrap;}
-  .profile-tag{font-size:11px;padding:4px 10px;border-radius:6px;background:var(--bg-card2);border:1px solid var(--border);color:var(--text-muted);}
-  .profile-tag.inst{color:var(--mint);border-color:rgba(94,231,191,0.2);background:var(--mint-glow);}
-  .profile-tag.lvl{color:var(--blue-soft);border-color:rgba(122,162,247,0.2);background:rgba(122,162,247,0.08);}
-  .profile-mascot{width:90px;height:110px;object-fit:contain;animation:float 3.5s ease-in-out infinite;}
-  @keyframes float{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-7px) rotate(1deg);}}
+  /* PAGE TITLE */
+  .page-title{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;margin-bottom:6px;}
+  .page-sub{font-size:14px;color:var(--text-muted);margin-bottom:32px;}
 
-  /* STATS ROW */
-  .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-  .stat-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;transition:border-color .2s;}
-  .stat-card:hover{border-color:rgba(94,231,191,0.2);}
-  .stat-label{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
-  .stat-value{font-family:'Space Mono',monospace;font-size:22px;font-weight:700;}
-  .stat-unit{font-size:12px;font-weight:400;color:var(--text-muted);margin-left:2px;font-family:'DM Sans',sans-serif;}
-  .stat-sub{font-size:11px;color:var(--text-dim);margin-top:4px;}
+  /* SECTIONS */
+  .settings-section{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:16px;}
+  .section-header{padding:16px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;}
+  .section-icon{font-size:16px;}
+  .section-label{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.2px;}
 
-  /* SECTION */
-  .section-title{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:14px;}
+  /* SETTING ROW */
+  .setting-row{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border);gap:16px;}
+  .setting-row:last-child{border-bottom:none;}
+  .setting-info{}
+  .setting-name{font-size:14px;font-weight:500;color:var(--text-main);margin-bottom:2px;}
+  .setting-desc{font-size:12px;color:var(--text-dim);}
 
-  /* ACHIEVEMENTS */
-  .ach-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
-  .ach-card{background:var(--bg-card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;gap:14px;align-items:flex-start;transition:border-color .2s,transform .2s;}
-  .ach-card:hover{border-color:rgba(187,154,247,0.3);transform:translateY(-2px);}
-  .ach-card.locked{opacity:.35;pointer-events:none;}
-  .ach-icon{font-size:28px;flex-shrink:0;margin-top:2px;}
-  .ach-name{font-size:13px;font-weight:600;color:var(--text-main);margin-bottom:3px;}
-  .ach-desc{font-size:11px;color:var(--text-dim);line-height:1.45;}
-  .ach-date{font-size:10px;color:var(--mint);margin-top:5px;font-family:'Space Mono',monospace;}
+  /* TOGGLE */
+  .toggle{position:relative;width:44px;height:24px;flex-shrink:0;}
+  .toggle input{opacity:0;width:0;height:0;position:absolute;}
+  .toggle-track{position:absolute;inset:0;background:var(--bg-card2);border:1px solid var(--border);border-radius:12px;cursor:pointer;transition:background .25s,border-color .25s;}
+  .toggle input:checked+.toggle-track{background:var(--mint);border-color:var(--mint);}
+  .toggle-thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform .25s;pointer-events:none;}
+  .toggle input:checked~.toggle-thumb{transform:translateX(20px);}
 
-  /* LEARNING PATH */
-  .path-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:22px 24px;margin-bottom:24px;}
-  .path-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1px solid var(--border);}
-  .path-row:last-child{border-bottom:none;padding-bottom:0;}
-  .path-row:first-child{padding-top:0;}
-  .path-icon{font-size:22px;flex-shrink:0;width:36px;text-align:center;}
-  .path-label{font-size:12px;color:var(--text-dim);margin-bottom:2px;}
-  .path-value{font-size:14px;font-weight:500;color:var(--text-main);}
-  .path-badge{margin-left:auto;font-size:11px;padding:4px 10px;border-radius:6px;}
-  .path-badge.active{background:var(--mint-glow);color:var(--mint);border:1px solid rgba(94,231,191,0.2);}
-  .path-badge.level{background:rgba(122,162,247,0.1);color:var(--blue-soft);border:1px solid rgba(122,162,247,0.2);}
+  /* SELECT */
+  .setting-select{background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:7px 30px 7px 12px;font-size:13px;color:var(--text-main);font-family:'DM Sans',sans-serif;outline:none;cursor:pointer;appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%238b949e' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;transition:border-color .2s;}
+  .setting-select:focus{border-color:var(--border-focus);}
 
-  /* HEATMAP */
-  .heatmap-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px 24px;margin-bottom:24px;}
-  .heatmap-grid{display:flex;gap:3px;flex-wrap:wrap;margin-top:12px;}
-  .hm-cell{width:13px;height:13px;border-radius:3px;background:var(--bg-card2);}
-  .hm-cell.l1{background:rgba(94,231,191,0.2);}
-  .hm-cell.l2{background:rgba(94,231,191,0.45);}
-  .hm-cell.l3{background:rgba(94,231,191,0.75);}
-  .hm-cell.l4{background:var(--mint);}
-  .heatmap-legend{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--text-dim);justify-content:flex-end;}
-  .hm-cell-sm{width:10px;height:10px;border-radius:2px;}
+  /* THEME PICKER */
+  .theme-pills{display:flex;gap:8px;}
+  .theme-pill{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card2);font-size:13px;color:var(--text-muted);cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'DM Sans',sans-serif;}
+  .theme-pill:hover{border-color:rgba(94,231,191,0.3);color:var(--text-main);}
+  .theme-pill.active{border-color:var(--mint);background:var(--mint-glow);color:var(--mint);}
+  .theme-dot{width:10px;height:10px;border-radius:50%;}
+
+  /* INPUT */
+  .setting-input-wrap{display:flex;gap:8px;align-items:center;flex:1;max-width:300px;}
+  .setting-input{flex:1;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;font-size:13px;color:var(--text-main);font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+  .setting-input:focus{border-color:var(--border-focus);}
+  .setting-input::placeholder{color:var(--text-dim);}
+  .setting-input.is-error{border-color:var(--error);background:var(--error-bg);}
+  .btn-save{background:var(--mint);color:var(--bg-deep);border:none;font-size:12px;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;transition:opacity .2s;}
+  .btn-save:hover{opacity:.85;}
+  .btn-danger{background:transparent;color:var(--error);border:1px solid rgba(232,93,117,0.3);font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,border-color .2s;}
+  .btn-danger:hover{background:var(--error-bg);border-color:var(--error);}
+
+  /* FIELD MESSAGE */
+  .field-msg{font-size:11px;margin-top:4px;}
+  .pass-wrap{position:relative;}
+  .pass-wrap .setting-input{padding-right:40px;}
+  .eye-btn{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text-dim);font-size:15px;padding:0;line-height:1;transition:color .2s;}
+  .eye-btn:hover{color:var(--text-muted);}
+  .field-msg.err{color:var(--error);}
+  .field-msg.ok{color:var(--mint);}
+
+  /* TOAST */
+  #toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--bg-card);border:1px solid rgba(94,231,191,0.3);border-radius:12px;padding:12px 20px;font-size:13px;color:var(--text-main);box-shadow:0 8px 32px rgba(0,0,0,0.4);opacity:0;transition:opacity .3s,transform .3s;z-index:999;pointer-events:none;white-space:nowrap;}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+  /* DANGER ZONE */
+  .danger-zone{background:rgba(232,93,117,0.05);border:1px solid rgba(232,93,117,0.15);}
 
   @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  .profile-header{animation:fadeUp .4s ease both;}
-  .stats-row     {animation:fadeUp .4s .08s ease both;}
-  .ach-grid      {animation:fadeUp .4s .14s ease both;}
-  .path-card     {animation:fadeUp .4s .18s ease both;}
-  .heatmap-card  {animation:fadeUp .4s .22s ease both;}
+  .settings-section{animation:fadeUp .4s ease both;}
+  .settings-section:nth-child(2){animation-delay:.06s;}
+  .settings-section:nth-child(3){animation-delay:.1s;}
+  .settings-section:nth-child(4){animation-delay:.14s;}
+  .settings-section:nth-child(5){animation-delay:.18s;}
 </style>
 </head>
 <body>
+<div id="toast"></div>
 <div class="page">
 
   <nav>
     <div class="nav-logo">lo<span>.</span>fi<span>·</span>focus</div>
-    <div class="nav-links">
-      <a href="home.html">Головна</a>
-      <a href="lessons.html">Уроки</a>
-      <a href="profile.html" class="active">Профіль</a>
-    </div>
     <a href="home.html" class="nav-back">← Назад</a>
   </nav>
 
-  <!-- HEADER -->
-  <div class="profile-header">
-    <div class="avatar-big" id="avatar-big">КП
-      <div class="avatar-level" id="avatar-level">🌱</div>
-    </div>
-    <div class="profile-info">
-      <div class="profile-name" id="profile-name">Ксенія</div>
-      <div class="profile-email" id="profile-email">user@gmail.com</div>
-      <div class="profile-tags">
-        <span class="profile-tag inst" id="tag-inst">🎸 Гітара</span>
-        <span class="profile-tag lvl" id="tag-lvl">🌱 Початківець</span>
-        <span class="profile-tag" id="tag-joined">📅 Приєднався сьогодні</span>
-      </div>
-    </div>
-    <img src="kael_guide.png" class="profile-mascot" id="profile-mascot" alt="Маскот">
-  </div>
+  <div class="page-title">Налаштування</div>
+  <div class="page-sub" id="settings-sub">Керуй своїм акаунтом та зовнішнім виглядом</div>
 
-  <!-- STATS -->
-  <div class="stats-row">
-    <div class="stat-card">
-      <div class="stat-label">Стрік</div>
-      <div class="stat-value" id="s-streak">0<span class="stat-unit">днів</span></div>
-      <div class="stat-sub">поспіль 🔥</div>
+  <!-- APPEARANCE -->
+  <div class="settings-section">
+    <div class="section-header">
+      <span class="section-icon">🎨</span>
+      <span class="section-label">Зовнішній вигляд</span>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Практика</div>
-      <div class="stat-value" id="s-minutes">0<span class="stat-unit">хв</span></div>
-      <div class="stat-sub">загалом</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Уроки</div>
-      <div class="stat-value" id="s-lessons">0<span class="stat-unit">з 48</span></div>
-      <div class="stat-sub">пройдено</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-label">Прогрес</div>
-      <div class="stat-value" id="s-pct">0<span class="stat-unit">%</span></div>
-      <div class="stat-sub">курсу</div>
-    </div>
-  </div>
 
-  <!-- LEARNING PATH -->
-  <div class="section-title">Моє навчання</div>
-  <div class="path-card">
-    <div class="path-row">
-      <div class="path-icon">🎸</div>
-      <div>
-        <div class="path-label">Інструмент</div>
-        <div class="path-value" id="path-inst">Гітара</div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Тема</div>
+        <div class="setting-desc">Обери темну або світлу тему інтерфейсу</div>
       </div>
-      <span class="path-badge active" id="path-inst-badge">активний</span>
-    </div>
-    <div class="path-row">
-      <div class="path-icon" id="path-lvl-icon">🌱</div>
-      <div>
-        <div class="path-label">Рівень</div>
-        <div class="path-value" id="path-lvl">Початківець</div>
-      </div>
-      <span class="path-badge level" id="path-lvl-badge">початківець</span>
-    </div>
-    <div class="path-row">
-      <div class="path-icon">📚</div>
-      <div>
-        <div class="path-label">Поточний урок</div>
-        <div class="path-value" id="path-lesson">Ще не розпочато</div>
+      <div class="theme-pills">
+        <button class="theme-pill active" id="theme-dark" onclick="setTheme('dark')">
+          <div class="theme-dot" style="background:#0d1117;border:1px solid #444;"></div> Темна
+        </button>
+        <button class="theme-pill" id="theme-light" onclick="setTheme('light')">
+          <div class="theme-dot" style="background:#f4f6f9;border:1px solid #ccc;"></div> Світла
+        </button>
       </div>
     </div>
-    <div class="path-row">
-      <div class="path-icon">🗓️</div>
-      <div>
-        <div class="path-label">На платформі з</div>
-        <div class="path-value" id="path-joined">—</div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Мова інтерфейсу</div>
+        <div class="setting-desc">Мова платформи</div>
       </div>
+      <select class="setting-select" id="lang-select" onchange="saveLang(this.value)">
+        <option value="uk">🇺🇦 Українська</option>
+        <option value="ru">🇷🇺 Русский</option>
+        <option value="en">🇬🇧 English</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Анімації маскота</div>
+        <div class="setting-desc">Вимкни якщо відволікає</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-anim" checked onchange="savePref('mascot_anim',this.checked)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Звукові сповіщення таймера</div>
+        <div class="setting-desc">Сигнал при зміні фази практики</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-sound" checked onchange="savePref('timer_sound',this.checked)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
     </div>
   </div>
 
-  <!-- ACHIEVEMENTS -->
-  <div class="section-title">Досягнення</div>
-  <div class="ach-grid" id="ach-grid"></div>
-
-  <!-- HEATMAP -->
-  <div class="section-title">Активність</div>
-  <div class="heatmap-card">
-    <div style="display:flex;justify-content:space-between;align-items:center;">
-      <span style="font-size:13px;color:var(--text-muted);">Останні 10 тижнів</span>
-      <span style="font-size:12px;color:var(--text-dim);" id="hm-total">0 сесій</span>
+  <!-- ACCOUNT -->
+  <div class="settings-section">
+    <div class="section-header">
+      <span class="section-icon">👤</span>
+      <span class="section-label">Акаунт</span>
     </div>
-    <div class="heatmap-grid" id="heatmap"></div>
-    <div class="heatmap-legend">
-      <span>Менше</span>
-      <div class="hm-cell hm-cell-sm" style="background:var(--bg-card2)"></div>
-      <div class="hm-cell hm-cell-sm l1"></div>
-      <div class="hm-cell hm-cell-sm l2"></div>
-      <div class="hm-cell hm-cell-sm l3"></div>
-      <div class="hm-cell hm-cell-sm l4"></div>
-      <span>Більше</span>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Ім'я</div>
+        <div class="setting-desc" id="current-name-desc">Поточне: —</div>
+      </div>
+      <div class="setting-input-wrap">
+        <input class="setting-input" type="text" id="inp-name" placeholder="Нове ім'я">
+        <button class="btn-save" onclick="changeName()">Зберегти</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Email</div>
+        <div class="setting-desc" id="current-email-desc">Поточний: —</div>
+        <div class="field-msg" id="msg-email"></div>
+      </div>
+      <div class="setting-input-wrap">
+        <input class="setting-input" type="email" id="inp-email" placeholder="Новий email" oninput="validateEmailField(this)">
+        <button class="btn-save" onclick="changeEmail()">Зберегти</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECURITY -->
+  <div class="settings-section">
+    <div class="section-header">
+      <span class="section-icon">🔒</span>
+      <span class="section-label">Безпека</span>
+    </div>
+
+    <div class="setting-row" style="flex-direction:column;align-items:flex-start;gap:12px;">
+      <div class="setting-info">
+        <div class="setting-name">Зміна пароля</div>
+        <div class="setting-desc">Мінімум 8 символів, велика літера, цифра</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;width:100%;">
+        <div class="pass-wrap" style="max-width:360px;">
+          <input class="setting-input" type="password" id="inp-pass-old" placeholder="Поточний пароль" style="max-width:360px;width:100%;">
+          <button class="eye-btn" type="button" onclick="togglePass('inp-pass-old',this)">👁</button>
+        </div>
+        <div class="pass-wrap" style="max-width:360px;">
+          <input class="setting-input" type="password" id="inp-pass-new" placeholder="Новий пароль" oninput="checkNewPass(this)" style="max-width:360px;width:100%;">
+          <button class="eye-btn" type="button" onclick="togglePass('inp-pass-new',this)">👁</button>
+        </div>
+        <div class="field-msg" id="msg-pass"></div>
+        <button class="btn-save" onclick="changePass()" style="align-self:flex-start;">Змінити пароль</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEARNING -->
+  <div class="settings-section">
+    <div class="section-header">
+      <span class="section-icon">🎸</span>
+      <span class="section-label">Навчання</span>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Інструмент</div>
+        <div class="setting-desc">Зміна інструменту скине поточний прогрес уроків</div>
+      </div>
+      <select class="setting-select" id="inst-select" onchange="changeInst(this.value)">
+        <option value="guitar">🎸 Гітара</option>
+        <option value="piano">🎹 Фортепіано</option>
+        
+        <option value="violin">🎻 Скрипка</option>
+        <option value="flute">🎵 Флейта</option>
+        <option value="vocal">🎤 Вокал</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Рівень</div>
+        <div class="setting-desc">Якщо ти виріс — підніми рівень</div>
+      </div>
+      <select class="setting-select" id="lvl-select" onchange="changeLevel(this.value)">
+        <option value="beginner">🌱 Початківець</option>
+        <option value="middle">🎯 Середній</option>
+        <option value="advanced">🔥 Впевнений</option>
+      </select>
+    </div>
+
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Нагадування про практику</div>
+        <div class="setting-desc">Щоденне сповіщення о вибраний час</div>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="toggle-remind" onchange="savePref('remind',this.checked)">
+        <div class="toggle-track"></div>
+        <div class="toggle-thumb"></div>
+      </label>
+    </div>
+  </div>
+
+  <!-- DANGER ZONE -->
+  <div class="settings-section danger-zone">
+    <div class="section-header">
+      <span class="section-icon">⚠️</span>
+      <span class="section-label" style="color:var(--error);">Небезпечна зона</span>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Скинути прогрес</div>
+        <div class="setting-desc">Видалить всю статистику і досягнення. Незворотньо.</div>
+      </div>
+      <button class="btn-danger" onclick="confirmReset()">Скинути</button>
+    </div>
+    <div class="setting-row">
+      <div class="setting-info">
+        <div class="setting-name">Вийти з акаунту</div>
+        <div class="setting-desc">Повернешся на головну сторінку</div>
+      </div>
+      <button class="btn-danger" onclick="logout()">Вийти</button>
     </div>
   </div>
 
 </div>
 <script>
-const INST_MAP={
-  guitar: {name:'Гітара',   icon:'🎸', mascot:'kael_guitar.jpg', lesson:'Перехід Am → E'},
-  piano:  {name:'Фортепіано',icon:'🎹', mascot:'kori_piano.png',  lesson:'До мажор'},
-  drums:{name:'Барабани',  icon:'🥁', mascot:'kael_guide.png',  lesson:'Перший акорд C'},
-  violin: {name:'Скрипка',  icon:'🎻', mascot:'kael_guide.png',  lesson:'Постановка смичка'},
-  flute:  {name:'Флейта',   icon:'🎵', mascot:'kori_flute.jpg',  lesson:'Перші ноти'},
-  vocal:  {name:'Вокал',    icon:'🎤', mascot:'kori_mic.jpg',    lesson:'Дихальні вправи'},
-};
-const LVL_MAP={
-  beginner:{name:'Початківець',icon:'🌱',badge:'початківець'},
-  middle:  {name:'Середній',   icon:'🎯',badge:'середній'},
-  advanced:{name:'Впевнений',  icon:'🔥',badge:'впевнений'},
-};
-const ALL_ACHIEVEMENTS=[
-  {id:'first',  icon:'🌱', name:'Перший крок',     desc:'Завершено перший урок',              unlock: u=>u.lessonsCompleted>=1},
-  {id:'week',   icon:'🔥', name:'Тиждень поспіль', desc:'7 днів без перерви',                 unlock: u=>u.streak>=7},
-  {id:'focus',  icon:'🎯', name:'Фокус-режим',     desc:'Концентрація >80% за сесію',         unlock: u=>u.lessonsCompleted>=3},
-  {id:'month',  icon:'🏆', name:'30 днів',         desc:'30 днів поспіль',                    unlock: u=>u.streak>=30},
-  {id:'lessons10',icon:'📚',name:'Десятка',        desc:'10 уроків пройдено',                 unlock: u=>u.lessonsCompleted>=10},
-  {id:'hour',   icon:'⏱️', name:'Година практики', desc:'60+ хвилин загальної практики',      unlock: u=>u.totalMinutes>=60},
-];
+const ALLOWED_DOMAINS=['gmail.com','ukr.net','outlook.com','hotmail.com','yahoo.com','icloud.com','meta.ua','i.ua','bigmir.net','proton.me','protonmail.com'];
 
-function initials(name){return (name||'??').split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
-function formatDate(iso){
-  if(!iso) return '—';
-  const d=new Date(iso);
-  return d.toLocaleDateString('uk-UA',{day:'numeric',month:'long',year:'numeric'});
+function getUser(){return JSON.parse(localStorage.getItem('lofi_user')||'{}');}
+function saveUser(u){localStorage.setItem('lofi_user',JSON.stringify(u));}
+
+function toast(msg,ok=true){
+  const t=document.getElementById('toast');
+  t.textContent=(ok?'✓ ':' ')+msg;
+  t.style.borderColor=ok?'rgba(94,231,191,0.3)':'rgba(232,93,117,0.3)';
+  t.classList.add('show');
+  clearTimeout(window._toastTimer);
+  window._toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
 }
 
+// ── INIT ──
 window.addEventListener('load',()=>{
   const raw=localStorage.getItem('lofi_user');
   if(!raw){window.location.href='index.html';return;}
-  const u=JSON.parse(raw);
-  const inst=INST_MAP[u.instrument||'guitar'];
-  const lvl=LVL_MAP[u.level||'beginner'];
-  const isNew=!u.lessonsCompleted||u.lessonsCompleted===0;
+  const u=getUser();
 
-  // header
-  document.getElementById('avatar-big').childNodes[0].textContent=initials(u.name||'??');
-  document.getElementById('avatar-level').textContent=lvl.icon;
-  document.getElementById('profile-name').textContent=u.name||'Учень';
-  document.getElementById('profile-email').textContent=u.email||'—';
-  document.getElementById('tag-inst').textContent=inst.icon+' '+inst.name;
-  document.getElementById('tag-lvl').textContent=lvl.icon+' '+lvl.name;
-  document.getElementById('tag-joined').textContent='📅 '+(u.joinedAt?formatDate(u.joinedAt):'Сьогодні');
-  document.getElementById('profile-mascot').src=inst.mascot;
+  document.getElementById('settings-sub').textContent=`Привіт, ${u.name||'учень'} — тут можна змінити все під себе`;
+  document.getElementById('current-name-desc').textContent='Поточне: '+(u.name||'—');
+  document.getElementById('current-email-desc').textContent='Поточний: '+(u.email||'—');
 
-  // stats
-  document.getElementById('s-streak').innerHTML=(u.streak||0)+'<span class="stat-unit">днів</span>';
-  document.getElementById('s-minutes').innerHTML=(u.totalMinutes||0)+'<span class="stat-unit">хв</span>';
-  document.getElementById('s-lessons').innerHTML=(u.lessonsCompleted||0)+'<span class="stat-unit">з 48</span>';
-  document.getElementById('s-pct').innerHTML=Math.round((u.lessonsCompleted||0)/48*100)+'<span class="stat-unit">%</span>';
+  // selects
+  document.getElementById('inst-select').value=u.instrument||'guitar';
+  document.getElementById('lvl-select').value=u.level||'beginner';
+  document.getElementById('lang-select').value=localStorage.getItem('lofi_lang')||'uk';
 
-  // path
-  document.getElementById('path-inst').textContent=inst.name;
-  document.getElementById('path-inst-badge').textContent=inst.icon+' активний';
-  document.getElementById('path-lvl-icon').textContent=lvl.icon;
-  document.getElementById('path-lvl').textContent=lvl.name;
-  document.getElementById('path-lvl-badge').textContent=lvl.badge;
-  document.getElementById('path-lesson').textContent=isNew?'Ще не розпочато':inst.lesson;
-  document.getElementById('path-joined').textContent=formatDate(u.joinedAt);
+  // theme
+  const theme=localStorage.getItem('lofi_theme')||'dark';
+  applyTheme(theme,false);
 
-  // achievements
-  const grid=document.getElementById('ach-grid');
-  ALL_ACHIEVEMENTS.forEach(a=>{
-    const unlocked=a.unlock(u);
-    const card=document.createElement('div');
-    card.className='ach-card'+(unlocked?'':' locked');
-    card.innerHTML=`
-      <div class="ach-icon">${a.icon}</div>
-      <div>
-        <div class="ach-name">${a.name}</div>
-        <div class="ach-desc">${a.desc}</div>
-        ${unlocked?'<div class="ach-date">✓ Отримано</div>':'<div class="ach-desc" style="margin-top:4px;color:var(--text-dim)">Заблоковано</div>'}
-      </div>`;
-    grid.appendChild(card);
-  });
-
-  // heatmap
-  const hmGrid=document.getElementById('heatmap');
-  const lvls=['','l1','l2','l3','l4'];
-  const pat=isNew
-    ?Array(70).fill(0)
-    :[0,0,1,1,2,3,2,1,0,0,0,1,2,2,3,4,3,2,1,0,1,1,2,3,4,4,3,3,2,1,0,1,1,2,3,3,2,2,1,0,0,0,1,1,2,4,3,1,0,0,0,1,2,3,4,4,4,2,1,0,1,2,3,3,4,3,3,2,1,0];
-  let sessions=0;
-  pat.forEach(v=>{if(v>0)sessions++;});
-  document.getElementById('hm-total').textContent=sessions+' сесій';
-  for(let i=0;i<70;i++){
-    const c=document.createElement('div');
-    c.className='hm-cell'+(pat[i]?' '+lvls[pat[i]]:'');
-    hmGrid.appendChild(c);
-  }
+  // toggles
+  const prefs=JSON.parse(localStorage.getItem('lofi_prefs')||'{}');
+  document.getElementById('toggle-anim').checked=prefs.mascot_anim!==false;
+  document.getElementById('toggle-sound').checked=prefs.timer_sound!==false;
+  document.getElementById('toggle-remind').checked=!!prefs.remind;
 });
+
+// ── THEME ──
+function applyTheme(t,save=true){
+  document.documentElement.setAttribute('data-theme',t);
+  document.getElementById('theme-dark').classList.toggle('active',t==='dark');
+  document.getElementById('theme-light').classList.toggle('active',t==='light');
+  if(save){localStorage.setItem('lofi_theme',t);toast('Тему змінено');}
+}
+function setTheme(t){applyTheme(t);}
+
+// ── LANG ──
+function saveLang(v){localStorage.setItem('lofi_lang',v);toast('Мову збережено (перезавантаж сторінку)');}
+
+// ── PREFS ──
+function savePref(key,val){
+  const p=JSON.parse(localStorage.getItem('lofi_prefs')||'{}');
+  p[key]=val;
+  localStorage.setItem('lofi_prefs',JSON.stringify(p));
+  toast('Збережено');
+}
+
+// ── NAME ──
+function changeName(){
+  const val=document.getElementById('inp-name').value.trim();
+  if(val.length<2){toast('Введи коректне ім\'я',false);return;}
+  const u=getUser();u.name=val;saveUser(u);
+  document.getElementById('current-name-desc').textContent='Поточне: '+val;
+  document.getElementById('inp-name').value='';
+  toast('Ім\'я змінено на «'+val+'»');
+}
+
+// ── EMAIL ──
+function validateEmailField(el){
+  const val=el.value.trim();
+  const msg=document.getElementById('msg-email');
+  if(!val){el.classList.remove('is-error');msg.textContent='';return true;}
+  const domain=val.slice(val.indexOf('@')+1).toLowerCase();
+  if(!val.includes('@')||!ALLOWED_DOMAINS.includes(domain)){
+    el.classList.add('is-error');
+    msg.className='field-msg err';
+    msg.textContent='Непідтримуваний домен. Використай gmail, ukr.net тощо';
+    return false;
+  }
+  el.classList.remove('is-error');
+  msg.className='field-msg ok';
+  msg.textContent='✓ Email коректний';
+  return true;
+}
+function changeEmail(){
+  const el=document.getElementById('inp-email');
+  if(!validateEmailField(el)){return;}
+  const val=el.value.trim();
+  if(!val){toast('Введи новий email',false);return;}
+  const u=getUser();u.email=val;saveUser(u);
+  document.getElementById('current-email-desc').textContent='Поточний: '+val;
+  el.value='';
+  document.getElementById('msg-email').textContent='';
+  toast('Email змінено');
+}
+
+// ── PASSWORD ──
+function passScore(v){
+  let s=0;
+  if(v.length>=8)s++;
+  if(/[A-ZА-ЯЁЇІЄҐ]/.test(v))s++;
+  if(/[a-zа-яёїієґ]/.test(v))s++;
+  if(/[0-9]/.test(v))s++;
+  if(/[^A-Za-zА-Яа-яёЁЇїІіЄєҐґ0-9]/.test(v))s++;
+  return s;
+}
+function checkNewPass(el){
+  const msg=document.getElementById('msg-pass');
+  const v=el.value;
+  if(!v){msg.textContent='';return;}
+  const s=passScore(v);
+  if(v.length<8){msg.className='field-msg err';msg.textContent='Мінімум 8 символів';return;}
+  if(s<3){msg.className='field-msg err';msg.textContent='Додай велику літеру та цифру';return;}
+  msg.className='field-msg ok';
+  msg.textContent='✓ Надійний пароль';
+}
+function changePass(){
+  const oldVal=document.getElementById('inp-pass-old').value;
+  const newVal=document.getElementById('inp-pass-new').value;
+  const msg=document.getElementById('msg-pass');
+  if(!oldVal){toast('Введи поточний пароль',false);return;}
+  if(passScore(newVal)<3||newVal.length<8){
+    msg.className='field-msg err';
+    msg.textContent='Пароль надто слабкий';
+    return;
+  }
+  // Firebase Auth тут замінить цю логіку
+  toast('Пароль оновлено (підключи Firebase для реального збереження)');
+  document.getElementById('inp-pass-old').value='';
+  document.getElementById('inp-pass-new').value='';
+  msg.textContent='';
+}
+
+// ── INSTRUMENT / LEVEL ──
+function changeInst(v){
+  const u=getUser();u.instrument=v;saveUser(u);
+  toast('Інструмент змінено');
+}
+function changeLevel(v){
+  const u=getUser();u.level=v;saveUser(u);
+  toast('Рівень змінено');
+}
+
+// ── DANGER ──
+function confirmReset(){
+  if(confirm('Скинути весь прогрес? Це незворотньо.')){
+    const u=getUser();
+    u.streak=0;u.totalMinutes=0;u.lessonsCompleted=0;
+    saveUser(u);
+    toast('Прогрес скинуто');
+  }
+}
+function logout(){
+  localStorage.removeItem('lofi_user');
+  localStorage.removeItem('lofi_tour_done');
+  window.location.href='index.html';
+}
+</script>
+<script type="module">
+import { onAuthReady, changeUserPassword, changeUserEmail, updateUserProfile, logoutUser, saveSettings } from './firebase.js';
+
+onAuthReady((user) => {
+  if (!user) { window.location.href = 'index.html'; return; }
+  localStorage.setItem('lofi_user', JSON.stringify(user));
+
+  document.getElementById('settings-sub').textContent = `Привіт, ${user.name||'учень'} — тут можна змінити все під себе`;
+  document.getElementById('current-name-desc').textContent  = 'Поточне: '  + (user.name  || '—');
+  document.getElementById('current-email-desc').textContent = 'Поточний: ' + (user.email || '—');
+  document.getElementById('inst-select').value = user.instrument || 'guitar';
+  document.getElementById('lvl-select').value  = user.level      || 'beginner';
+  document.getElementById('lang-select').value = localStorage.getItem('lofi_lang') || 'uk';
+
+  const theme = localStorage.getItem('lofi_theme') || 'dark';
+  applyTheme(theme, false);
+
+  const prefs = JSON.parse(localStorage.getItem('lofi_prefs') || '{}');
+  document.getElementById('toggle-anim').checked   = prefs.mascot_anim !== false;
+  document.getElementById('toggle-sound').checked  = prefs.timer_sound !== false;
+  document.getElementById('toggle-remind').checked = !!prefs.remind;
+});
+
+// Перевизначаємо функції щоб використовували Firebase
+window.changeName = async function() {
+  const val = document.getElementById('inp-name').value.trim();
+  if (val.length < 2) { toast('Введи коректне ім'я', false); return; }
+  try {
+    await updateUserProfile({ name: val });
+    document.getElementById('current-name-desc').textContent = 'Поточне: ' + val;
+    document.getElementById('inp-name').value = '';
+    toast('Ім'я змінено на «' + val + '»');
+  } catch (e) { toast('Помилка: ' + e.message, false); }
+};
+
+window.changeEmail = async function() {
+  const el  = document.getElementById('inp-email');
+  const old = document.getElementById('inp-pass-old').value;
+  if (!validateEmailField(el)) return;
+  if (!old) { toast('Введи поточний пароль для підтвердження', false); return; }
+  try {
+    await changeUserEmail(old, el.value.trim());
+    document.getElementById('current-email-desc').textContent = 'Поточний: ' + el.value.trim();
+    el.value = '';
+    document.getElementById('msg-email').textContent = '';
+    toast('Email змінено');
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') toast('Невірний пароль', false);
+    else toast('Помилка: ' + e.message, false);
+  }
+};
+
+window.changePass = async function() {
+  const oldVal = document.getElementById('inp-pass-old').value;
+  const newVal = document.getElementById('inp-pass-new').value;
+  const msg    = document.getElementById('msg-pass');
+  if (!oldVal) { toast('Введи поточний пароль', false); return; }
+  if (passScore(newVal) < 3 || newVal.length < 8) {
+    msg.className = 'field-msg err';
+    msg.textContent = 'Пароль надто слабкий';
+    return;
+  }
+  try {
+    await changeUserPassword(oldVal, newVal);
+    toast('Пароль оновлено ✓');
+    document.getElementById('inp-pass-old').value = '';
+    document.getElementById('inp-pass-new').value = '';
+    msg.textContent = '';
+  } catch (e) {
+    if (e.code === 'auth/wrong-password') toast('Невірний поточний пароль', false);
+    else toast('Помилка: ' + e.message, false);
+  }
+};
+
+window.changeInst = async function(v) {
+  await updateUserProfile({ instrument: v });
+  toast('Інструмент змінено');
+};
+
+window.changeLevel = async function(v) {
+  await updateUserProfile({ level: v });
+  toast('Рівень змінено');
+};
+
+window.confirmReset = async function() {
+  if (!confirm('Скинути весь прогрес? Це незворотньо.')) return;
+  await updateUserProfile({ streak:0, totalMinutes:0, lessonsCompleted:0,
+    todayMinutes:0, weekActivity:[0,0,0,0,0,0,0], completedLessons:[] });
+  toast('Прогрес скинуто');
+};
+
+window.logout = function() { logoutUser(); };
+
+window.togglePass = function(id, btn) {
+  const inp = document.getElementById(id);
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? '👁' : '🙈';
+};
 </script>
 </body>
 </html>
