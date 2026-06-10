@@ -293,14 +293,14 @@ window.addEventListener('load', () => {
   if (isNew) {
     document.getElementById('mascot-title').textContent = `Привіт, ${nm}! 🌱`;
     document.getElementById('mascot-sub').innerHTML =
-      `Ти тільки починаєш — це найкращий момент! Пройди перший урок і тут з'явиться твоя <strong>статистика та графіки</strong>.`;
+      `Ти тільки починаєш — це найкращий момент! Пройди перший урок і тут з\'явиться твоя <strong>статистика та графіки</strong>.`;
   } else {
     const streak = user.streak || 0;
     document.getElementById('mascot-title').textContent = streak >= 7
       ? `${nm}, ти на вогні! 🔥` : `Молодець, ${nm}! 💪`;
     document.getElementById('mascot-sub').innerHTML = streak >= 7
-      ? `Вже <strong>${streak} днів</strong> поспіль — це справжня дисципліна! Продовжуй і наступне досягнення вже близько.`
-      : `Ти вже провів <strong>${user.totalMinutes||0} хвилин</strong> практики і пройшов <strong>${user.lessonsCompleted||0} уроків</strong>. Так тримати!`;
+      ? `Вже <strong>${streak} днів</strong> поспіль — це справжня дисципліна!`
+      : `Ти вже провів <strong>${user.totalMinutes||0} хв</strong> практики і пройшов <strong>${user.lessonsCompleted||0} уроків</strong>. Так тримати!`;
   }
 
   // Big stats
@@ -319,8 +319,8 @@ window.addEventListener('load', () => {
   document.getElementById('s-lessons-delta').textContent = `${Math.round(lessons/48*100)}% курсу`;
   document.getElementById('s-ach-delta').textContent     = achCount === 6 ? '🏆 Всі відкрито!' : `Ще ${6-achCount} попереду`;
 
-  // Charts
-  buildMinutesChart(isNew ? Array(7).fill(0) : DEMO_WEEK_DATA, DEMO_WEEKS);
+  // Charts — тільки реальні дані
+  buildMinutesChart(Array(7).fill(0), DEMO_WEEKS);
   buildInstChart(user, isNew);
 
   // Heatmap
@@ -370,12 +370,10 @@ function switchPeriod(period, btn) {
   currentPeriod = period;
   document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
-  const raw = localStorage.getItem('lofi_user');
-  const isNew = !raw || !JSON.parse(raw).lessonsCompleted;
   if (period === 'week') {
-    buildMinutesChart(isNew ? Array(7).fill(0) : DEMO_WEEK_DATA, DEMO_WEEKS);
+    buildMinutesChart(Array(7).fill(0), DEMO_WEEKS);
   } else {
-    buildMinutesChart(isNew ? Array(4).fill(0) : DEMO_MONTH_DATA, DEMO_MONTHS);
+    buildMinutesChart(Array(4).fill(0), DEMO_MONTHS);
   }
 }
 
@@ -420,15 +418,9 @@ function buildInstChart(user, isNew) {
 function buildHeatmap(isNew) {
   const grid = document.getElementById('heatmap');
   const lvls = ['','l1','l2','l3','l4'];
-  const pat  = isNew
-    ? Array(105).fill(0)
-    : Array.from({length:105}, (_,i) => {
-        const r = Math.random();
-        if (i > 84) return r < 0.4 ? Math.floor(r*10)+1 : 0;
-        return r < 0.25 ? Math.floor(r*16)+1 : 0;
-      }).map(v => Math.min(v, 4));
-  let sessions = pat.filter(v => v > 0).length;
-  document.getElementById('hm-sessions').textContent = sessions + ' сесій';
+  // Heatmap — завжди порожній поки немає реальних даних
+  const pat = Array(105).fill(0);
+  document.getElementById('hm-sessions').textContent = isNew ? 'Ще немає сесій' : '0 сесій';
   for (let i = 0; i < 105; i++) {
     const c = document.createElement('div');
     c.className = 'hm-cell' + (pat[i] ? ' ' + lvls[pat[i]] : '');
