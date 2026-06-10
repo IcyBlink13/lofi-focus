@@ -1,0 +1,53 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>Lo-Fi Focus — Вчись грати. Без зайвого.</title>
+<desc>Платформа для самостійного навчання музиці</desc>
+
+<rect width="1200" height="630" fill="#0d1117"/>
+
+<defs>
+  <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+    <path d="M 44 0 L 0 0 0 44" fill="none" stroke="#5ee7bf" stroke-width="0.5" opacity="0.1"/>
+  </pattern>
+</defs>
+<rect width="1200" height="630" fill="url(#grid)"/>
+
+<circle cx="600" cy="270" r="180" fill="#5ee7bf" opacity="0.05"/>
+<circle cx="600" cy="270" r="110" fill="#5ee7bf" opacity="0.04"/>
+
+<!-- Note stem -->
+<rect x="648" y="160" width="10" height="130" rx="5" fill="#5ee7bf"/>
+<!-- Note flag -->
+<path d="M658 160 Q720 190 700 240" fill="none" stroke="#5ee7bf" stroke-width="9" stroke-linecap="round"/>
+<!-- Note head -->
+<ellipse cx="622" cy="290" rx="32" ry="22" fill="#5ee7bf" transform="rotate(-18 622 290)"/>
+
+<!-- Accents -->
+<circle cx="730" cy="200" r="8" fill="#5ee7bf" opacity="0.4"/>
+<circle cx="510" cy="175" r="5" fill="#5ee7bf" opacity="0.25"/>
+<circle cx="748" cy="305" r="7" fill="#7aa2f7" opacity="0.35"/>
+<circle cx="488" cy="330" r="5" fill="#bb9af7" opacity="0.3"/>
+<circle cx="820" cy="150" r="4" fill="#5ee7bf" opacity="0.2"/>
+<circle cx="390" cy="200" r="3" fill="#7aa2f7" opacity="0.2"/>
+
+<!-- Top line -->
+<rect x="0" y="0" width="1200" height="3" fill="#5ee7bf" opacity="0.7"/>
+
+<!-- Logo -->
+<text x="600" y="430" text-anchor="middle" font-family="monospace" font-size="56" font-weight="700" fill="#5ee7bf" letter-spacing="-1">lo.fi·focus</text>
+
+<!-- Tagline -->
+<text x="600" y="488" text-anchor="middle" font-family="sans-serif" font-size="24" fill="#8b949e">Вчись грати. Без зайвого.</text>
+
+<!-- Pills -->
+<rect x="320" y="530" width="130" height="38" rx="19" fill="#161b22" stroke="#5ee7bf" stroke-width="1" stroke-opacity="0.3"/>
+<text x="385" y="554" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#5ee7bf">🎸 Гітара</text>
+
+<rect x="468" y="530" width="130" height="38" rx="19" fill="#161b22" stroke="#7aa2f7" stroke-width="1" stroke-opacity="0.3"/>
+<text x="533" y="554" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#7aa2f7">🎹 Піаніно</text>
+
+<rect x="616" y="530" width="130" height="38" rx="19" fill="#161b22" stroke="#bb9af7" stroke-width="1" stroke-opacity="0.3"/>
+<text x="681" y="554" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#bb9af7">🎵 Флейта</text>
+
+<rect x="764" y="530" width="130" height="38" rx="19" fill="#161b22" stroke="#ff9e64" stroke-width="1" stroke-opacity="0.3"/>
+<text x="829" y="554" text-anchor="middle" font-family="sans-serif" font-size="18" fill="#ff9e64">🎤 Вокал</text>
+</svg>
