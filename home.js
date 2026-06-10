@@ -377,10 +377,12 @@ function setBubble(html) {
 window.addEventListener('load', () => {
   const raw = localStorage.getItem('lofi_user');
   if (!raw) { window.location.href = 'index.html'; return; }
+  // Extra safety - don't redirect if we have valid user data
+  try { JSON.parse(raw); } catch(e) { window.location.href = 'index.html'; return; }
 
   const user   = JSON.parse(raw);
   const inst   = INST_MAP[user.instrument] || INST_MAP.guitar;
-  const isNew  = !user.lessonsCompleted || user.lessonsCompleted === 0;
+  const isNew  = !user.lessonsCompleted || Number(user.lessonsCompleted) === 0;
   const name   = (user.name && user.name.trim()) || 'Учень';
   const isKori = ['flute','vocal','piano'].includes(user.instrument);
 
@@ -412,7 +414,7 @@ window.addEventListener('load', () => {
   } else {
     document.getElementById('hero-subtitle').innerHTML =
       `Останній урок: <strong style="color:var(--text-main)">${inst.lastLesson}</strong><br>Продовжимо де зупинились?`;
-    document.getElementById('streak-num').textContent = user.streak || 0;
+    document.getElementById('streak-num').textContent = Number(user.streak) || 0;
 
     // Bubble rotation
     const bubbles = isKori ? BUBBLES_KORI : BUBBLES_KAEL;
