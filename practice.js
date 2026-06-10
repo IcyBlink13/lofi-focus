@@ -139,42 +139,6 @@ const state = {
   level: 'beginner',
 };
 
-// ── YouTube API ──
-const YT_API_KEY = 'AIzaSyB6JR1QuxO9OlvyF337a6GXPzJitTVcrOk';
-
-async function findYouTubeVideo(lessonTitle, instrument) {
-  // Build search query
-  const langQuery = 'урок'; // Ukrainian
-  const instMap = {
-    guitar:  'beginner guitar lesson tutorial',
-    piano:   'beginner piano lesson tutorial',
-    drums:   'beginner drums lesson tutorial',
-    flute:   'beginner flute lesson tutorial',
-    vocal:   'beginner singing vocal lesson',
-    violin:  'beginner violin lesson tutorial',
-  };
-  // Simple English query works best for YouTube search
-  const query = instMap[instrument] || 'music lesson beginner';
-
-  try {
-    const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoEmbeddable=true&videoSyndicated=true&maxResults=5&relevanceLanguage=uk&key=${YT_API_KEY}`
-    );
-    const data = await res.json();
-    if (data.error) {
-      console.log('YouTube API error:', data.error.message);
-      return null;
-    }
-    if (data.items && data.items.length > 0) {
-      // Повертаємо перший результат
-      return data.items[0].id.videoId;
-    }
-  } catch(e) {
-    console.log('YouTube API error:', e);
-  }
-  return null;
-}
-
 // ── Init ──
 window.addEventListener('load', () => {
   const raw = localStorage.getItem('lofi_user');
@@ -282,93 +246,44 @@ function switchTab(tab, btn) {
 }
 
 // ── Відео ──
-async function loadVideo() {
-  const wrap = document.getElementById('video-wrap');
+function loadVideo() {
+  const wrap   = document.getElementById('video-wrap');
   const lesson = state.lesson;
   if (!lesson) return;
 
-  // Показати лоадер
-  wrap.innerHTML = `
-    <div class="video-placeholder">
-      <div style="font-size:32px;">🎬</div>
-      <div style="color:var(--text-muted);font-size:13px;">Шукаємо відео...</div>
-    </div>`;
-
-  // Знайти відео через YouTube API
-  let videoId = lesson.videoId || null;
-  if (!videoId) {
-    videoId = await findYouTubeVideo(lesson.title, state.instrument);
-  }
-
-  const searchUrl = 'https://www.youtube.com/results?search_query=' +
-    encodeURIComponent((lesson.title || '') + ' lesson tutorial');
-
-  if (videoId) {
-    lesson.videoId = videoId;
-    // Показуємо iframe + кнопку відкрити на YouTube
-    wrap.innerHTML = `
-      <div style="position:relative;width:100%;height:100%;">
-        <iframe
-          id="lesson-iframe"
-          src="https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1"
-          allow="encrypted-media; picture-in-picture"
-          allowfullscreen
-          style="width:100%;height:calc(100% - 40px);border:none;display:block;"></iframe>
-        <div style="height:40px;background:var(--bg-card2);display:flex;align-items:center;justify-content:center;gap:12px;">
-          <span style="font-size:12px;color:var(--text-dim);">Відео не грає?</span>
-          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank"
-             style="font-size:12px;color:var(--mint);text-decoration:none;padding:4px 12px;border:1px solid rgba(94,231,191,0.3);border-radius:6px;">
-            ▶ Відкрити на YouTube
-          </a>
-        </div>
-      </div>`;
-  } else {
-    // Якщо API не знайшов — одразу показуємо кнопку пошуку
-    wrap.innerHTML = `
-      <div class="video-placeholder" style="gap:14px;flex-direction:column;">
-        <div style="font-size:40px;">🎬</div>
-        <div style="font-size:14px;color:var(--text-main);font-weight:500;text-align:center;padding:0 16px;">${lesson.title}</div>
-        <a href="${searchUrl}" target="_blank"
-           style="background:var(--mint);color:var(--bg-deep);font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;text-decoration:none;">
-          🔍 Знайти відео на YouTube
-        </a>
-      </div>`;
-  }
-}
-
-function showVideoFallback(lesson) {
-  const wrap = document.getElementById('video-wrap');
-  const query = encodeURIComponent((lesson.title || '') + ' урок');
-  const ytSearch = `https://www.youtube.com/results?search_query=${query}`;
+  const instMap = {
+    guitar:  'guitar lesson beginner tutorial',
+    piano:   'piano lesson beginner tutorial',
+    flute:   'flute lesson beginner tutorial',
+    vocal:   'singing vocal lesson beginner',
+    violin:  'violin lesson beginner tutorial',
+  };
+  const q = encodeURIComponent((instMap[state.instrument] || 'music lesson') + ' ' + (lesson.title || ''));
+  const searchUrl = `https://www.youtube.com/results?search_query=${q}`;
 
   wrap.innerHTML = `
     <div class="video-placeholder" style="gap:16px;flex-direction:column;">
-      <div style="font-size:40px;">🎬</div>
-      <div style="font-size:15px;color:var(--text-main);font-weight:500;text-align:center;padding:0 20px;">${lesson.title || 'Урок'}</div>
-      <div style="font-size:12px;color:var(--text-muted);text-align:center;">Відео відкриється на YouTube в новій вкладці</div>
-      <a href="${ytSearch}"
-         target="_blank"
-         style="background:var(--mint);color:var(--bg-deep);font-size:14px;font-weight:600;padding:11px 28px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;margin-top:4px;">
+      <div style="font-size:48px;">🎬</div>
+      <div style="font-size:15px;color:var(--text-main);font-weight:600;text-align:center;padding:0 24px;">
+        ${lesson.title}
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);text-align:center;">
+        Відео відкриється на YouTube в новій вкладці
+      </div>
+      <a href="${searchUrl}" target="_blank"
+         style="background:var(--mint);color:var(--bg-deep);font-size:14px;font-weight:700;
+                padding:12px 28px;border-radius:12px;text-decoration:none;
+                display:inline-flex;align-items:center;gap:8px;margin-top:4px;">
         ▶ Знайти відео на YouTube
       </a>
+      <div style="font-size:11px;color:var(--text-dim);">
+        Після перегляду поверніться сюди — таймер чекає!
+      </div>
     </div>`;
 }
 
-function openYouTube() {
-  if (!state.lesson) return;
-  const wrap = document.getElementById('video-wrap');
-  wrap.innerHTML = `
-    <div class="video-placeholder" style="gap:16px;">
-      <div style="font-size:36px;">🎬</div>
-      <div style="font-size:14px;color:var(--text-main);font-weight:500;">\${state.lesson.title}</div>
-      <div style="font-size:12px;color:var(--text-muted);">Відео відкриється на YouTube</div>
-      <a href="https://www.youtube.com/embed/\${state.lesson.videoId}?autoplay=1" 
-         target="_blank"
-         style="background:var(--mint);color:var(--bg-deep);font-size:13px;font-weight:600;padding:10px 24px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;">
-        ▶ Відкрити відео
-      </a>
-    </div>`;
-}
+function showVideoFallback(lesson) { loadVideo(); }
+
 
 // ── Вибір тривалості ──
 function selectDur(minutes, btn) {
