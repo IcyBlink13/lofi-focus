@@ -538,9 +538,9 @@ function closeExitWarning() {
   document.getElementById('exit-warning-overlay').style.display = 'none';
 }
 function confirmExit() {
-  state.running = false;
-  clearInterval(state.intervalId);
-  window.location.href = 'home.html';
+  document.getElementById('exit-warning-overlay').style.display = 'none';
+  if (typeof reallyStop === 'function') reallyStop();
+  else { clearInterval(state && state.intervalId); window.location.href = 'home.html'; }
 }
 document.getElementById('exit-warning-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeExitWarning();
@@ -553,5 +553,12 @@ window.doStopTimer = function() {
 </script>
 
 <script src="practice.js"></script>
+<script>
+function toggleAvatarMenu(e){e.stopPropagation();const m=document.getElementById('nav-menu');m.style.display=m.style.display==='none'?'block':'none';}
+document.addEventListener('click',()=>{const m=document.getElementById('nav-menu');if(m)m.style.display='none';});
+// Set initials
+const _u=localStorage.getItem('lofi_user');
+if(_u){const _n=JSON.parse(_u).name||'??';document.getElementById('nav-initials').textContent=_n.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);}
+</script>
 </body>
 </html>

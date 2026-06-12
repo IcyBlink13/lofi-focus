@@ -7,7 +7,7 @@ const INST_MAP = {
   guitar:  { label:'Каель · гітара',  mascot:'kael_guitar.jpg', badge:'🎸 Гітара',     lastLesson:'Гітара — Перехід Am → E' },
   piano:   { label:'Корі · фортепіано', mascot:'kori_piano.png', badge:'🎹 Фортепіано', lastLesson:'Фортепіано — До мажор' },
   drums: { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🥁 Барабани',    lastLesson:'Барабани — Перший акорд C' },
-  violin:  { label:'Каель · ваш гід', mascot:'kael_guide.png',  badge:'🎻 Скрипка',    lastLesson:'Скрипка — Постановка смичка' },
+  violin:  { label:'Каель · скрипка',  mascot:'kael_violin.png',  badge:'🎻 Скрипка',    lastLesson:'Скрипка — Постановка смичка' },
   flute:   { label:'Корі · флейта',   mascot:'kori_flute.jpg',  badge:'🎵 Флейта',     lastLesson:'Флейта — Перші ноти' },
   vocal:   { label:'Корі · вокал',    mascot:'kori_mic.jpg',    badge:'🎤 Вокал',      lastLesson:'Вокал — Дихальні вправи' },
 };

@@ -273,7 +273,7 @@ window.addEventListener('load',()=>{
   document.getElementById('path-lvl-icon').textContent=lvl.icon;
   document.getElementById('path-lvl').textContent=lvl.name;
   document.getElementById('path-lvl-badge').textContent=lvl.badge;
-  document.getElementById('path-lesson').textContent=isNew?'Ще не розпочато':inst.lesson;
+  document.getElementById('path-lesson').textContent=(u.lessonsCompleted>0)?inst.lesson:'Ще не розпочато';
   document.getElementById('path-joined').textContent=formatDate(u.joinedAt);
 
   // achievements

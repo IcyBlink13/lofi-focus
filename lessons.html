@@ -5,7 +5,7 @@
   <meta name="description" content="Гітара, фортепіано, флейта, вокал, скрипка — уроки для всіх рівнів.">
   <meta property="og:title" content="Lo-Fi Focus — Каталог уроків">
   <meta property="og:description" content="Гітара, фортепіано, флейта, вокал, скрипка — уроки для всіх рівнів.">
-  <meta property="og:image" content="https://IcyBlink13.github.io/lofi-focus/kael_guide.png">
+  <meta property="og:image" content="https://IcyBlink13.github.io/lofi-focus/og-image.svg">
   <meta property="og:url" content="https://IcyBlink13.github.io/lofi-focus/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
@@ -114,7 +114,14 @@
       <a href="progress.html">Прогрес</a>
       <a href="notes.html">Нотатки</a>
     </div>
-    <div class="nav-avatar" id="nav-avatar">??</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="toggleAvatarMenu(event)" style="cursor:pointer;position:relative;">
+        <span id="nav-initials">??</span>
+        <div id="nav-menu" style="display:none;position:absolute;top:42px;right:0;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px;width:170px;z-index:100;box-shadow:0 12px 32px rgba(0,0,0,0.5);">
+          <a href="profile.html" style="display:block;padding:8px 12px;font-size:13px;color:#8b949e;text-decoration:none;border-radius:8px;">👤 Профіль</a>
+          <a href="settings.html" style="display:block;padding:8px 12px;font-size:13px;color:#8b949e;text-decoration:none;border-radius:8px;">⚙️ Налаштування</a>
+          <a href="index.html" onclick="localStorage.removeItem('lofi_user')" style="display:block;padding:8px 12px;font-size:13px;color:#ff9e64;text-decoration:none;border-radius:8px;">🚪 Вийти</a>
+        </div>
+      </div>
   </nav>
 
   <div class="page-header">

@@ -134,7 +134,14 @@
       <a href="lessons.html">Уроки</a>
       <a href="progress.html">Прогрес</a>
     </div>
-    <div class="nav-avatar" id="nav-avatar">??</div>
+    <div class="nav-avatar" id="nav-avatar" onclick="toggleAvatarMenu(event)" style="cursor:pointer;position:relative;">
+        <span id="nav-initials">??</span>
+        <div id="nav-menu" style="display:none;position:absolute;top:42px;right:0;background:#161b22;border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:8px;width:170px;z-index:100;box-shadow:0 12px 32px rgba(0,0,0,0.5);">
+          <a href="profile.html" style="display:block;padding:8px 12px;font-size:13px;color:#8b949e;text-decoration:none;border-radius:8px;">👤 Профіль</a>
+          <a href="settings.html" style="display:block;padding:8px 12px;font-size:13px;color:#8b949e;text-decoration:none;border-radius:8px;">⚙️ Налаштування</a>
+          <a href="index.html" onclick="localStorage.removeItem('lofi_user')" style="display:block;padding:8px 12px;font-size:13px;color:#ff9e64;text-decoration:none;border-radius:8px;">🚪 Вийти</a>
+        </div>
+      </div>
   </nav>
 
   <div class="page-header">
@@ -155,7 +162,7 @@
       <select class="form-input" id="new-inst">
         <option value="guitar">🎸 Гітара</option>
         <option value="piano">🎹 Фортепіано</option>
-        <option value="drums">🥁 Барабани</option>
+        
         <option value="violin">🎻 Скрипка</option>
         <option value="flute">🎵 Флейта</option>
         <option value="vocal">🎤 Вокал</option>
@@ -181,7 +188,7 @@
       <option value="all">Всі інструменти</option>
       <option value="guitar">🎸 Гітара</option>
       <option value="piano">🎹 Фортепіано</option>
-      <option value="drums">🥁 Барабани</option>
+      
       <option value="violin">🎻 Скрипка</option>
       <option value="flute">🎵 Флейта</option>
       <option value="vocal">🎤 Вокал</option>

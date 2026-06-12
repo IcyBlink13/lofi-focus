@@ -441,13 +441,14 @@ function skipPhase() {
 
 // ── Стоп ──
 function stopTimer() {
-  // Show sad Kori warning
   const overlay = document.getElementById('exit-warning-overlay');
-  if (overlay) {
-    overlay.classList.add('show');
+  if (overlay && state.running) {
+    overlay.style.display = 'flex';
     return;
   }
-  if (!confirm('Зупинити сесію?')) return;
+  reallyStop();
+}
+function reallyStop() {
   clearInterval(state.intervalId);
   state.running = false;
   document.getElementById('timer-active').style.display = 'none';
