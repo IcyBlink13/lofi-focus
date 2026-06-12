@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lo-Fi Focus — 404</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
+    --border:rgba(255,255,255,0.07);
+    --mint:#5ee7bf;--mint-glow:rgba(94,231,191,0.12);
+    --lavender:#bb9af7;--error:#e85d75;
+    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--bg-deep);color:var(--text-main);
+    font-family:'DM Sans',sans-serif;min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    overflow:hidden;
+  }
+  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
+    background-size:44px 44px;}
+
+  .container{
+    position:relative;z-index:1;
+    display:flex;flex-direction:column;align-items:center;
+    text-align:center;padding:40px 24px;max-width:480px;
+  }
+
+  /* Mascot */
+  .mascot{
+    width:200px;object-fit:contain;
+    animation:sad-float 4s ease-in-out infinite;
+    filter:drop-shadow(0 8px 24px rgba(187,154,247,0.2));
+    margin-bottom:8px;
+  }
+  @keyframes sad-float{
+    0%,100%{transform:translateY(0) rotate(-1deg);}
+    50%{transform:translateY(-8px) rotate(1deg);}
+  }
+
+  /* Speech bubble */
+  .bubble{
+    background:var(--bg-card);border:1px solid rgba(187,154,247,0.2);
+    border-radius:14px 14px 14px 4px;
+    padding:12px 16px;font-size:13px;color:var(--text-muted);
+    line-height:1.6;margin-bottom:32px;max-width:280px;
+    animation:fadeUp .5s .3s ease both;opacity:0;
+  }
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+  /* 404 number */
+  .error-code{
+    font-family:'Space Mono',monospace;
+    font-size:96px;font-weight:700;line-height:1;
+    background:linear-gradient(135deg,var(--lavender),var(--mint));
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+    background-clip:text;
+    margin-bottom:12px;
+    animation:fadeUp .5s .1s ease both;opacity:0;
+  }
+
+  .error-title{
+    font-family:'Space Mono',monospace;font-size:18px;font-weight:700;
+    color:var(--text-main);margin-bottom:8px;
+    animation:fadeUp .5s .15s ease both;opacity:0;
+  }
+
+  .error-sub{
+    font-size:14px;color:var(--text-muted);line-height:1.65;
+    margin-bottom:32px;
+    animation:fadeUp .5s .2s ease both;opacity:0;
+  }
+
+  /* Buttons */
+  .btns{
+    display:flex;gap:10px;flex-wrap:wrap;justify-content:center;
+    animation:fadeUp .5s .25s ease both;opacity:0;
+  }
+  .btn-primary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--mint);color:var(--bg-deep);
+    font-size:14px;font-weight:700;padding:12px 24px;
+    border-radius:12px;text-decoration:none;
+    transition:opacity .2s,transform .15s;
+  }
+  .btn-primary:hover{opacity:.88;transform:translateY(-1px);}
+  .btn-secondary{
+    display:inline-flex;align-items:center;gap:8px;
+    background:var(--bg-card);color:var(--text-muted);
+    font-size:14px;font-weight:500;padding:12px 24px;
+    border-radius:12px;text-decoration:none;border:1px solid var(--border);
+    transition:border-color .2s,color .2s;
+  }
+  .btn-secondary:hover{border-color:var(--mint);color:var(--mint);}
+
+  /* Logo */
+  .logo{
+    position:fixed;top:24px;left:28px;z-index:10;
+    font-family:'Space Mono',monospace;font-size:16px;font-weight:700;
+    color:var(--mint);text-decoration:none;
+  }
+  .logo span{color:var(--text-muted);}
+
+  /* Floating notes */
+  .note{
+    position:fixed;font-size:20px;opacity:0;
+    animation:float-note 6s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes float-note{
+    0%{opacity:0;transform:translateY(0);}
+    20%{opacity:.3;}
+    80%{opacity:.15;}
+    100%{opacity:0;transform:translateY(-120px);}
+  }
+</style>
+</head>
+<body>
+
+<a href="index.html" class="logo">lo<span>.</span>fi<span>·</span>focus</a>
+
+<!-- Floating notes decoration -->
+<div class="note" style="left:8%;top:70%;animation-delay:0s;">🎵</div>
+<div class="note" style="left:85%;top:65%;animation-delay:2s;">🎶</div>
+<div class="note" style="left:15%;top:40%;animation-delay:4s;">♪</div>
+<div class="note" style="left:78%;top:30%;animation-delay:1s;">🎵</div>
+
+<div class="container">
+  <img src="kori_sad.png" class="mascot" alt="Корі сумна">
+
+  <div class="bubble">
+    Здається, ця сторінка загубилася...<br>
+    Навіть я не знаю де вона 😔
+  </div>
+
+  <div class="error-code">404</div>
+  <div class="error-title">Сторінку не знайдено</div>
+  <div class="error-sub">
+    Можливо посилання застаріло або сторінка<br>переїхала на нову адресу.
+  </div>
+
+  <div class="btns">
+    <a href="index.html" class="btn-primary">🏠 На головну</a>
+    <a href="lessons.html" class="btn-secondary">📚 До уроків</a>
+  </div>
+</div>
+
+<script>
+  // Redirect to home after 30 seconds
+  setTimeout(() => {
+    window.location.href = 'index.html';
+  }, 30000);
+</script>
+</body>
+</html>

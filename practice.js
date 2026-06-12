@@ -147,7 +147,35 @@ window.addEventListener('load', () => {
   state.instrument = user.instrument || 'guitar';
   state.level      = user.level      || 'beginner';
 
-  // Знайти урок
+  // Читаємо параметр ?lesson= з URL
+  const urlParams  = new URLSearchParams(window.location.search);
+  const lessonId   = urlParams.get('lesson');
+
+  // Знайти урок по ID або за замовчуванням
+  if (lessonId) {
+    // Парсимо ID типу "g-b-1" або "vo-b-2"
+    const parts = lessonId.split('-');
+    // Маппінг префіксів інструментів
+    const instPrefixMap = {
+      'g': 'guitar', 'p': 'piano', 'f': 'flute',
+      'v': 'violin', 'vo': 'vocal',
+    };
+    // Визначаємо інструмент
+    let detectedInst = null;
+    if (lessonId.startsWith('vo')) detectedInst = 'vocal';
+    else if (lessonId.startsWith('g-')) detectedInst = 'guitar';
+    else if (lessonId.startsWith('p-')) detectedInst = 'piano';
+    else if (lessonId.startsWith('f-')) detectedInst = 'flute';
+    else if (lessonId.startsWith('v-')) detectedInst = 'violin';
+
+    if (detectedInst) state.instrument = detectedInst;
+
+    // Визначаємо рівень
+    if (lessonId.includes('-b-')) state.level = 'beginner';
+    else if (lessonId.includes('-m-')) state.level = 'middle';
+    else if (lessonId.includes('-a-')) state.level = 'advanced';
+  }
+
   const instLessons = LESSONS[state.instrument] || LESSONS.guitar;
   state.lesson = instLessons[state.level] || instLessons.beginner || Object.values(instLessons)[0];
 
@@ -413,6 +441,12 @@ function skipPhase() {
 
 // ── Стоп ──
 function stopTimer() {
+  // Show sad Kori warning
+  const overlay = document.getElementById('exit-warning-overlay');
+  if (overlay) {
+    overlay.classList.add('show');
+    return;
+  }
   if (!confirm('Зупинити сесію?')) return;
   clearInterval(state.intervalId);
   state.running = false;

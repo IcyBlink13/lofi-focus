@@ -2,306 +2,556 @@
 <html lang="uk">
 <head>
 <meta charset="UTF-8">
-  <meta name="description" content="Гітара, фортепіано, флейта, вокал, скрипка — уроки для всіх рівнів.">
-  <meta property="og:title" content="Lo-Fi Focus — Каталог уроків">
-  <meta property="og:description" content="Гітара, фортепіано, флейта, вокал, скрипка — уроки для всіх рівнів.">
-  <meta property="og:image" content="https://IcyBlink13.github.io/lofi-focus/kael_guide.png">
+  <meta name="description" content="Фазовий таймер для музичної практики. Адаптація → Практика → Повторення.">
+  <meta property="og:title" content="Lo-Fi Focus — Кімната практики">
+  <meta property="og:description" content="Фазовий таймер для музичної практики. Адаптація → Практика → Повторення.">
+  <meta property="og:image" content="https://IcyBlink13.github.io/lofi-focus/og-image.svg">
   <meta property="og:url" content="https://IcyBlink13.github.io/lofi-focus/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Lo-Fi Focus — Каталог уроків">
-  <meta name="twitter:description" content="Гітара, фортепіано, флейта, вокал, скрипка — уроки для всіх рівнів.">
+  <meta name="twitter:title" content="Lo-Fi Focus — Кімната практики">
+  <meta name="twitter:description" content="Фазовий таймер для музичної практики. Адаптація → Практика → Повторення.">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LoFi Focus — Каталог уроків</title>
+<title>LoFi Focus — Кімната практики</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg-deep:#0d1117;--bg-card:#161b22;--bg-card2:#1c2333;
+  :root {
+    --bg-deep:#0d1117; --bg-card:#161b22; --bg-card2:#1c2333;
     --border:rgba(255,255,255,0.07);
-    --mint:#5ee7bf;--mint-glow:rgba(94,231,191,0.12);
-    --blue-soft:#7aa2f7;--lavender:#bb9af7;--streak-hot:#ff9e64;
-    --text-main:#e6edf3;--text-muted:#8b949e;--text-dim:#484f58;
+    --mint:#5ee7bf; --mint-glow:rgba(94,231,191,0.12);
+    --blue-soft:#7aa2f7; --lavender:#bb9af7;
+    --text-main:#e6edf3; --text-muted:#8b949e; --text-dim:#484f58;
+    --streak-hot:#ff9e64;
+    --phase-adapt:#7aa2f7;
+    --phase-practice:#5ee7bf;
+    --phase-repeat:#bb9af7;
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg-deep);color:var(--text-main);font-family:'DM Sans',sans-serif;min-height:100vh;}
-  body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-    background-image:linear-gradient(rgba(94,231,191,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(94,231,191,0.025) 1px,transparent 1px);
-    background-size:44px 44px;}
-  .page{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px 60px;}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg-deep); color:var(--text-main); font-family:'DM Sans',sans-serif; height:100vh; display:flex; flex-direction:column; overflow:hidden; }
 
-  /* NAV */
-  nav{display:flex;align-items:center;justify-content:space-between;padding:20px 0 16px;border-bottom:1px solid var(--border);margin-bottom:32px;}
-  .nav-logo{font-family:'Space Mono',monospace;font-size:18px;font-weight:700;color:var(--mint);text-decoration:none;}
-  .nav-logo span{color:var(--text-muted);}
-  .nav-links{display:flex;gap:8px;}
-  .nav-links a{text-decoration:none;color:var(--text-muted);font-size:14px;padding:6px 14px;border-radius:8px;transition:background .2s,color .2s;}
-  .nav-links a:hover{background:var(--bg-card2);color:var(--text-main);}
-  .nav-links a.active{color:var(--mint);}
-  .nav-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#3ab89a,#7aa2f7);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--bg-deep);cursor:pointer;}
+  /* ── NAV ── */
+  nav {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:12px 24px; border-bottom:1px solid var(--border);
+    flex-shrink:0; background:var(--bg-deep); z-index:10;
+  }
+  .nav-left { display:flex; align-items:center; gap:16px; }
+  .nav-logo { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; color:var(--mint); text-decoration:none; }
+  .nav-logo span { color:var(--text-muted); }
+  .nav-lesson-title { font-size:13px; color:var(--text-muted); padding-left:16px; border-left:1px solid var(--border); }
+  .nav-lesson-title strong { color:var(--text-main); }
+  .nav-right { display:flex; align-items:center; gap:10px; }
+  .btn-back { text-decoration:none; color:var(--text-muted); font-size:13px; padding:6px 14px; border-radius:8px; border:1px solid var(--border); transition:border-color .2s,color .2s; }
+  .btn-back:hover { border-color:var(--mint); color:var(--mint); }
+  .phase-indicator {
+    display:flex; align-items:center; gap:8px;
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:10px; padding:6px 14px;
+  }
+  .phase-dot { width:8px; height:8px; border-radius:50%; background:var(--text-dim); transition:background .4s; }
+  .phase-name { font-size:12px; color:var(--text-muted); font-weight:500; }
 
-  /* HEADER */
-  .page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;}
-  .page-title{font-family:'Space Mono',monospace;font-size:24px;font-weight:700;}
-  .page-title .accent{color:var(--mint);}
-  .lessons-count{font-size:13px;color:var(--text-dim);}
+  /* ── MAIN LAYOUT ── */
+  .room {
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    flex:1; overflow:hidden;
+  }
 
-  /* FILTERS */
-  .filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:24px;align-items:center;}
-  .filter-group{display:flex;gap:6px;flex-wrap:wrap;}
-  .filter-sep{width:1px;height:24px;background:var(--border);margin:0 4px;}
-  .filter-btn{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg-card);font-size:13px;color:var(--text-muted);cursor:pointer;transition:border-color .2s,color .2s,background .2s;font-family:'DM Sans',sans-serif;}
-  .filter-btn:hover{border-color:rgba(94,231,191,0.3);color:var(--text-main);}
-  .filter-btn.active{border-color:var(--mint);background:var(--mint-glow);color:var(--mint);}
-  .filter-btn.lvl-beginner.active{border-color:var(--mint);color:var(--mint);background:var(--mint-glow);}
-  .filter-btn.lvl-middle.active{border-color:var(--blue-soft);color:var(--blue-soft);background:rgba(122,162,247,0.1);}
-  .filter-btn.lvl-advanced.active{border-color:var(--lavender);color:var(--lavender);background:rgba(187,154,247,0.1);}
+  /* ── LEFT: VIDEO + NOTES ── */
+  .left-panel {
+    display:flex; flex-direction:column;
+    border-right:1px solid var(--border);
+    overflow:hidden;
+  }
+  .video-wrap {
+    position:relative; flex-shrink:0;
+    background:#000;
+    aspect-ratio:16/9;
+    max-height:56vh;
+  }
+  .video-wrap iframe {
+    width:100%; height:100%; border:none; display:block;
+  }
+  .video-placeholder {
+    width:100%; height:100%;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:12px; background:var(--bg-card2);
+    color:var(--text-dim); font-size:14px;
+  }
+  .video-placeholder .play-icon {
+    width:56px; height:56px; border-radius:50%;
+    background:var(--mint-glow); border:2px solid rgba(94,231,191,0.3);
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; cursor:pointer; transition:background .2s;
+  }
+  .video-placeholder .play-icon:hover { background:rgba(94,231,191,0.2); }
 
-  /* SEARCH */
-  .search-wrap{margin-left:auto;position:relative;}
-  .search-input{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:8px 14px 8px 36px;font-size:13px;color:var(--text-main);font-family:'DM Sans',sans-serif;outline:none;width:200px;transition:border-color .2s,width .3s;}
-  .search-input:focus{border-color:rgba(94,231,191,0.3);width:260px;}
-  .search-input::placeholder{color:var(--text-dim);}
-  .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text-dim);font-size:14px;pointer-events:none;}
+  /* notes */
+  .notes-panel {
+    flex:1; overflow-y:auto; padding:18px 20px;
+    border-top:1px solid var(--border);
+  }
+  .notes-header {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px;
+  }
+  .notes-title { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.5px; }
+  .notes-tabs { display:flex; gap:4px; }
+  .notes-tab {
+    font-size:12px; padding:4px 10px; border-radius:6px;
+    border:1px solid var(--border); color:var(--text-dim);
+    cursor:pointer; transition:border-color .2s,color .2s;
+    background:none; font-family:'DM Sans',sans-serif;
+  }
+  .notes-tab.active { border-color:var(--mint); color:var(--mint); background:var(--mint-glow); }
 
-  /* GRID */
-  .lessons-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  /* chord sheet */
+  .chord-sheet { display:none; }
+  .chord-sheet.active { display:block; }
+  .chord-row { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+  .chord-card {
+    background:var(--bg-card2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px; min-width:80px;
+    text-align:center;
+  }
+  .chord-name { font-family:'Space Mono',monospace; font-size:14px; font-weight:700; color:var(--text-main); margin-bottom:6px; }
+  .chord-diagram { font-size:11px; color:var(--text-muted); line-height:1.6; font-family:'Space Mono',monospace; }
 
-  /* LESSON CARD */
-  .lesson-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:border-color .2s,transform .2s;cursor:pointer;text-decoration:none;display:flex;flex-direction:column;}
-  .lesson-card:hover{border-color:rgba(94,231,191,0.3);transform:translateY(-3px);}
-  .lesson-card.done{border-color:rgba(94,231,191,0.2);}
-  .lesson-card.locked{opacity:.5;pointer-events:none;}
+  /* my notes */
+  .my-notes-area {
+    width:100%; min-height:120px;
+    background:var(--bg-card2); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px;
+    color:var(--text-main); font-size:13px;
+    font-family:'DM Sans',sans-serif; resize:vertical;
+    outline:none; transition:border-color .2s;
+    line-height:1.6;
+  }
+  .my-notes-area:focus { border-color:rgba(94,231,191,0.3); }
+  .my-notes-area::placeholder { color:var(--text-dim); }
 
-  .card-thumb{height:130px;background:var(--bg-card2);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
-  .card-thumb-bg{position:absolute;inset:0;opacity:0.07;}
-  .card-thumb-icon{font-size:44px;position:relative;z-index:1;}
-  .card-done-badge{position:absolute;top:10px;right:10px;width:26px;height:26px;border-radius:50%;background:var(--mint);color:var(--bg-deep);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;z-index:2;}
-  .card-locked-badge{position:absolute;top:10px;right:10px;font-size:18px;z-index:2;}
-  .card-num{position:absolute;top:10px;left:10px;font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);z-index:2;}
+  /* lesson steps */
+  .steps-list { display:none; flex-direction:column; gap:8px; }
+  .steps-list.active { display:flex; }
+  .step-item {
+    display:flex; align-items:flex-start; gap:10px;
+    padding:10px 12px; border-radius:10px;
+    border:1px solid var(--border); background:var(--bg-card2);
+    cursor:pointer; transition:border-color .2s;
+  }
+  .step-item:hover { border-color:rgba(94,231,191,0.25); }
+  .step-item.done { border-color:rgba(94,231,191,0.3); opacity:.7; }
+  .step-check {
+    width:18px; height:18px; border-radius:50%;
+    border:2px solid var(--border); flex-shrink:0; margin-top:1px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:10px; transition:background .2s,border-color .2s;
+  }
+  .step-item.done .step-check { background:var(--mint); border-color:var(--mint); color:var(--bg-deep); }
+  .step-text { font-size:13px; color:var(--text-muted); line-height:1.5; }
+  .step-item.done .step-text { text-decoration:line-through; color:var(--text-dim); }
 
-  .card-body{padding:16px;flex:1;display:flex;flex-direction:column;}
-  .card-inst{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:6px;}
-  .card-title{font-size:14px;font-weight:500;color:var(--text-main);margin-bottom:10px;line-height:1.45;flex:1;}
-  .card-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-  .card-pill{font-size:11px;padding:3px 9px;border-radius:6px;background:var(--bg-card2);color:var(--text-muted);}
-  .card-pill.beginner{color:var(--mint);background:var(--mint-glow);}
-  .card-pill.middle{color:var(--blue-soft);background:rgba(122,162,247,0.1);}
-  .card-pill.advanced{color:var(--lavender);background:rgba(187,154,247,0.1);}
-  .card-time{font-size:11px;color:var(--text-dim);margin-left:auto;display:flex;align-items:center;gap:4px;}
+  /* ── RIGHT PANEL ── */
+  .right-panel {
+    display:flex; flex-direction:column;
+    overflow:hidden; background:var(--bg-deep);
+  }
 
-  /* EMPTY STATE */
-  .empty-state{grid-column:1/-1;padding:60px 20px;text-align:center;}
-  .empty-icon{font-size:48px;margin-bottom:16px;}
-  .empty-title{font-size:16px;font-weight:500;color:var(--text-main);margin-bottom:8px;}
-  .empty-sub{font-size:13px;color:var(--text-dim);}
+  /* TIMER SETUP */
+  .timer-setup {
+    padding:24px 20px; border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  .setup-title { font-family:'Space Mono',monospace; font-size:11px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:14px; }
+  .duration-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:6px; margin-bottom:14px; }
+  .dur-btn {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:8px; padding:8px 4px; font-size:12px;
+    color:var(--text-muted); cursor:pointer; text-align:center;
+    transition:border-color .2s,color .2s,background .2s;
+    font-family:'DM Sans',sans-serif;
+  }
+  .dur-btn:hover { border-color:rgba(94,231,191,0.3); color:var(--text-main); }
+  .dur-btn.selected { border-color:var(--mint); background:var(--mint-glow); color:var(--mint); }
+  .dur-btn .dur-min { font-family:'Space Mono',monospace; font-size:16px; font-weight:700; display:block; }
+  .dur-btn .dur-label { font-size:10px; color:var(--text-dim); display:block; margin-top:2px; }
+  .dur-btn.selected .dur-label { color:var(--mint); }
 
-  /* PROGRESS BAR on card */
-  .card-progress{height:3px;background:var(--bg-card2);margin-top:10px;border-radius:2px;overflow:hidden;}
-  .card-progress-fill{height:100%;border-radius:2px;background:var(--mint);}
+  .phase-preview {
+    display:flex; gap:4px; margin-bottom:14px;
+  }
+  .phase-bar {
+    height:6px; border-radius:3px;
+    transition:flex .3s;
+  }
+  .phase-bar.adapt    { background:var(--phase-adapt);    flex:2; }
+  .phase-bar.practice { background:var(--phase-practice); flex:6; }
+  .phase-bar.repeat   { background:var(--phase-repeat);   flex:2; }
 
-  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-  .lesson-card{animation:fadeUp .4s ease both;}
+  .phase-labels { display:flex; justify-content:space-between; font-size:10px; color:var(--text-dim); margin-bottom:14px; }
+
+  .start-btn {
+    width:100%; background:var(--mint); color:var(--bg-deep);
+    font-size:15px; font-weight:700; padding:12px;
+    border-radius:12px; border:none; cursor:pointer;
+    font-family:'DM Sans',sans-serif;
+    transition:opacity .2s,transform .15s;
+  }
+  .start-btn:hover { opacity:.88; transform:translateY(-1px); }
+  .start-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+  /* TIMER ACTIVE */
+  .timer-active {
+    padding:20px; border-bottom:1px solid var(--border);
+    flex-shrink:0; display:none;
+  }
+  .timer-phase-label {
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    font-family:'Space Mono',monospace; margin-bottom:8px;
+    color:var(--text-dim);
+  }
+  .timer-phase-desc { font-size:13px; color:var(--text-muted); margin-bottom:16px; }
+  .timer-display {
+    font-family:'Space Mono',monospace; font-size:52px; font-weight:700;
+    text-align:center; margin-bottom:12px; line-height:1;
+    transition:color .4s;
+  }
+  .timer-progress-wrap {
+    background:var(--bg-card2); border-radius:6px; height:6px; margin-bottom:16px; overflow:hidden;
+  }
+  .timer-progress-bar {
+    height:100%; border-radius:6px;
+    transition:width .5s linear, background .4s;
+    background:var(--mint);
+  }
+  .timer-controls { display:flex; gap:8px; }
+  .ctrl-btn {
+    flex:1; padding:10px; border-radius:10px; border:1px solid var(--border);
+    background:var(--bg-card); color:var(--text-muted);
+    font-size:13px; cursor:pointer; font-family:'DM Sans',sans-serif;
+    transition:border-color .2s,color .2s,background .2s;
+  }
+  .ctrl-btn:hover { border-color:var(--mint); color:var(--mint); background:var(--mint-glow); }
+  .ctrl-btn.primary { background:var(--mint); color:var(--bg-deep); border-color:var(--mint); font-weight:600; }
+  .ctrl-btn.primary:hover { opacity:.88; }
+  .ctrl-btn.danger { color:var(--streak-hot); border-color:rgba(255,158,100,0.2); }
+  .ctrl-btn.danger:hover { background:rgba(255,158,100,0.08); border-color:var(--streak-hot); }
+
+  /* phase dots row */
+  .phase-steps {
+    display:flex; gap:6px; margin-bottom:12px;
+  }
+  .phase-step {
+    flex:1; height:4px; border-radius:2px;
+    background:var(--bg-card2);
+    transition:background .4s;
+  }
+  .phase-step.active { background:var(--mint); }
+  .phase-step.done   { background:rgba(94,231,191,0.35); }
+
+  /* BOTTOM: session info + mascot */
+  .right-bottom {
+    flex:1; overflow-y:auto; padding:16px 20px;
+    display:flex; flex-direction:column; gap:14px;
+  }
+  .session-stats {
+    display:grid; grid-template-columns:1fr 1fr; gap:8px;
+  }
+  .sess-card {
+    background:var(--bg-card); border:1px solid var(--border);
+    border-radius:10px; padding:12px 14px;
+  }
+  .sess-label { font-size:10px; color:var(--text-dim); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .sess-val { font-family:'Space Mono',monospace; font-size:18px; font-weight:700; color:var(--text-main); }
+  .sess-val .unit { font-size:11px; font-weight:400; color:var(--text-muted); margin-left:2px; font-family:'DM Sans',sans-serif; }
+
+  /* mascot corner in right panel */
+  .mascot-corner {
+    display:flex; align-items:flex-end; gap:12px; margin-top:auto;
+  }
+  .mascot-corner-img {
+    width:72px; flex-shrink:0; object-fit:contain;
+    animation:idle-float 3.5s ease-in-out infinite;
+    filter:drop-shadow(0 4px 12px rgba(94,231,191,0.15));
+    cursor:pointer;
+  }
+  @keyframes idle-float { 0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-6px) rotate(1deg);} }
+  .mascot-corner-bubble {
+    background:var(--bg-card); border:1px solid rgba(94,231,191,0.2);
+    border-radius:12px 12px 12px 4px;
+    padding:10px 12px; font-size:12px; color:var(--text-muted);
+    line-height:1.55; flex:1;
+    animation:fadeIn .3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+  /* FINISH OVERLAY */
+  #finish-overlay {
+    position:fixed; inset:0; z-index:100;
+    background:rgba(0,0,0,0.85);
+    display:none; align-items:center; justify-content:center;
+  }
+  #finish-overlay.show { display:flex; }
+  .finish-card {
+    background:var(--bg-card); border:1px solid rgba(94,231,191,0.3);
+    border-radius:24px; padding:40px 36px; width:400px; text-align:center;
+    position:relative; overflow:hidden;
+  }
+  .finish-card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,transparent,var(--mint),transparent); }
+  .finish-mascot { width:110px; object-fit:contain; margin-bottom:12px; animation:idle-float 3.5s ease-in-out infinite; }
+  .finish-title { font-family:'Space Mono',monospace; font-size:22px; font-weight:700; margin-bottom:8px; }
+  .finish-title .accent { color:var(--mint); }
+  .finish-sub { font-size:14px; color:var(--text-muted); margin-bottom:24px; line-height:1.6; }
+  .finish-stats { display:flex; gap:12px; justify-content:center; margin-bottom:28px; }
+  .finish-stat { background:var(--bg-card2); border:1px solid var(--border); border-radius:12px; padding:14px 20px; }
+  .finish-stat-val { font-family:'Space Mono',monospace; font-size:24px; font-weight:700; color:var(--mint); }
+  .finish-stat-label { font-size:11px; color:var(--text-dim); margin-top:2px; }
+  .finish-btns { display:flex; gap:10px; }
+  .finish-btn { flex:1; padding:12px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:'DM Sans',sans-serif; transition:opacity .2s; border:none; }
+  .finish-btn.primary { background:var(--mint); color:var(--bg-deep); }
+  .finish-btn.secondary { background:var(--bg-card2); color:var(--text-muted); border:1px solid var(--border); }
+  .finish-btn:hover { opacity:.85; }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+  .left-panel  { animation:fadeUp .4s ease both; }
+  .right-panel { animation:fadeUp .4s .08s ease both; }
 </style>
 </head>
 <body>
-<div class="page">
 
-  <nav>
+<!-- FINISH OVERLAY -->
+<div id="finish-overlay">
+  <div class="finish-card">
+    <img id="finish-mascot" src="kael_guide.png" class="finish-mascot" alt="Маскот">
+    <div class="finish-title">Сесію <span class="accent">завершено!</span> 🎉</div>
+    <div class="finish-sub" id="finish-sub">Відмінна робота! Ти провів продуктивну практику.</div>
+    <div class="finish-stats">
+      <div class="finish-stat">
+        <div class="finish-stat-val" id="finish-time">0</div>
+        <div class="finish-stat-label">хвилин</div>
+      </div>
+      <div class="finish-stat">
+        <div class="finish-stat-val" id="finish-phases">3</div>
+        <div class="finish-stat-label">фази</div>
+      </div>
+    </div>
+    <div class="finish-btns">
+      <button class="finish-btn secondary" onclick="window.location.href='home.html'">← На головну</button>
+      <button class="finish-btn primary" onclick="restartSession()">Ще одна сесія →</button>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-left">
     <a href="home.html" class="nav-logo">lo<span>.</span>fi<span>·</span>focus</a>
-    <div class="nav-links">
-      <a href="home.html">Головна</a>
-      <a href="lessons.html" class="active">Уроки</a>
-      <a href="progress.html">Прогрес</a>
-      <a href="notes.html">Нотатки</a>
-    </div>
-    <div class="nav-avatar" id="nav-avatar">??</div>
-  </nav>
-
-  <div class="page-header">
-    <div>
-      <div class="page-title">Каталог <span class="accent">уроків</span></div>
-    </div>
-    <div class="lessons-count" id="lessons-count">Завантаження...</div>
-  </div>
-
-  <!-- FILTERS -->
-  <div class="filters">
-    <!-- Інструменти -->
-    <div class="filter-group" id="inst-filters">
-      <button class="filter-btn active" data-inst="all" onclick="setFilter('inst','all',this)">Всі</button>
-      <button class="filter-btn" data-inst="guitar"  onclick="setFilter('inst','guitar',this)">🎸 Гітара</button>
-      <button class="filter-btn" data-inst="piano"   onclick="setFilter('inst','piano',this)">🎹 Фортепіано</button>
-      
-      <button class="filter-btn" data-inst="violin"  onclick="setFilter('inst','violin',this)">🎻 Скрипка</button>
-      <button class="filter-btn" data-inst="flute"   onclick="setFilter('inst','flute',this)">🎵 Флейта</button>
-      <button class="filter-btn" data-inst="vocal"   onclick="setFilter('inst','vocal',this)">🎤 Вокал</button>
-    </div>
-
-    <div class="filter-sep"></div>
-
-    <!-- Рівень -->
-    <div class="filter-group">
-      <button class="filter-btn active" data-lvl="all"      onclick="setFilter('lvl','all',this)">Всі рівні</button>
-      <button class="filter-btn lvl-beginner" data-lvl="beginner" onclick="setFilter('lvl','beginner',this)">🌱 Початківець</button>
-      <button class="filter-btn lvl-middle"   data-lvl="middle"   onclick="setFilter('lvl','middle',this)">🎯 Середній</button>
-      <button class="filter-btn lvl-advanced" data-lvl="advanced" onclick="setFilter('lvl','advanced',this)">🔥 Впевнений</button>
-    </div>
-
-    <!-- Пошук -->
-    <div class="search-wrap">
-      <span class="search-icon">🔍</span>
-      <input class="search-input" type="text" placeholder="Пошук уроку..." id="search-input" oninput="renderCards()">
+    <div class="nav-lesson-title">
+      <strong id="nav-lesson-name">Гітара — Перехід Am → E</strong>
     </div>
   </div>
+  <div class="nav-right">
+    <div class="phase-indicator">
+      <div class="phase-dot" id="nav-phase-dot"></div>
+      <span class="phase-name" id="nav-phase-name">Готовий до початку</span>
+    </div>
+    <a href="home.html" class="btn-back">← Вийти</a>
+  </div>
+</nav>
 
-  <!-- GRID -->
-  <div class="lessons-grid" id="lessons-grid"></div>
+<!-- ROOM -->
+<div class="room">
 
+  <!-- LEFT -->
+  <div class="left-panel">
+    <!-- VIDEO -->
+    <div class="video-wrap" id="video-wrap">
+      <div class="video-placeholder" id="video-placeholder">
+        <div class="play-icon" onclick="loadVideo()">▶</div>
+        <div id="video-lesson-name">Натисни щоб завантажити відео уроку</div>
+        <div style="font-size:12px;color:var(--text-dim)" id="video-lesson-sub">YouTube · завантаження...</div>
+      </div>
+    </div>
+
+    <!-- NOTES / CHORDS / STEPS -->
+    <div class="notes-panel">
+      <div class="notes-header">
+        <div class="notes-title">Матеріали уроку</div>
+        <div class="notes-tabs">
+          <button class="notes-tab active" onclick="switchTab('chords',this)">Акорди</button>
+          <button class="notes-tab" onclick="switchTab('steps',this)">Кроки</button>
+          <button class="notes-tab" onclick="switchTab('mynotes',this)">Нотатки</button>
+        </div>
+      </div>
+
+      <!-- CHORDS TAB -->
+      <div class="chord-sheet active" id="tab-chords">
+        <div class="chord-row" id="chord-row"></div>
+        <div style="font-size:12px;color:var(--text-dim);margin-top:4px;" id="chord-hint">
+          X = не грати · 0 = відкрита струна · цифра = лад
+        </div>
+      </div>
+
+      <!-- STEPS TAB -->
+      <div class="steps-list" id="tab-steps"></div>
+
+      <!-- MY NOTES TAB -->
+      <div class="chord-sheet" id="tab-mynotes">
+        <textarea class="my-notes-area" id="my-notes"
+          placeholder="Записуй що важко дається, що вийшло, на що звернути увагу наступного разу..."></textarea>
+        <div style="display:flex;justify-content:flex-end;margin-top:8px;">
+          <button onclick="saveNotes()" style="background:var(--mint);color:var(--bg-deep);border:none;padding:7px 16px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">Зберегти</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+
+    <!-- TIMER SETUP -->
+    <div class="timer-setup" id="timer-setup">
+      <div class="setup-title">Фазовий таймер</div>
+      <div class="duration-grid">
+        <button class="dur-btn" onclick="selectDur(15,this)">
+          <span class="dur-min">15</span><span class="dur-label">хв</span>
+        </button>
+        <button class="dur-btn selected" onclick="selectDur(30,this)">
+          <span class="dur-min">30</span><span class="dur-label">хв · рекомендовано</span>
+        </button>
+        <button class="dur-btn" onclick="selectDur(45,this)">
+          <span class="dur-min">45</span><span class="dur-label">хв</span>
+        </button>
+        <button class="dur-btn" onclick="selectDur(60,this)">
+          <span class="dur-min">60</span><span class="dur-label">хв</span>
+        </button>
+      </div>
+
+      <div class="phase-preview">
+        <div class="phase-bar adapt"></div>
+        <div class="phase-bar practice"></div>
+        <div class="phase-bar repeat"></div>
+      </div>
+      <div class="phase-labels">
+        <span id="lbl-adapt" style="color:var(--phase-adapt)">🔵 Адаптація · 20%</span>
+        <span id="lbl-practice" style="color:var(--phase-practice)">🟢 Практика · 60%</span>
+        <span id="lbl-repeat" style="color:var(--phase-repeat)">🟣 Повторення · 20%</span>
+      </div>
+      <div id="phase-time-hint" style="font-size:12px;color:var(--text-dim);margin-bottom:14px;text-align:center;">
+        6 хв · 18 хв · 6 хв
+      </div>
+      <button class="start-btn" id="start-btn" onclick="startTimer()">▶ Почати сесію</button>
+    </div>
+
+    <!-- TIMER ACTIVE -->
+    <div class="timer-active" id="timer-active">
+      <div class="phase-steps">
+        <div class="phase-step" id="pstep-0"></div>
+        <div class="phase-step" id="pstep-1"></div>
+        <div class="phase-step" id="pstep-2"></div>
+      </div>
+      <div class="timer-phase-label" id="timer-phase-label">АДАПТАЦІЯ</div>
+      <div class="timer-phase-desc" id="timer-phase-desc">Ознайомся з матеріалом, не поспішай</div>
+      <div class="timer-display" id="timer-display">06:00</div>
+      <div class="timer-progress-wrap">
+        <div class="timer-progress-bar" id="timer-progress-bar" style="width:100%"></div>
+      </div>
+      <div class="timer-controls">
+        <button class="ctrl-btn primary" id="ctrl-playpause" onclick="togglePause()">⏸ Пауза</button>
+        <button class="ctrl-btn" onclick="skipPhase()">⏭ Пропустити</button>
+        <button class="ctrl-btn danger" onclick="stopTimer()">✕ Стоп</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM -->
+    <div class="right-bottom">
+      <!-- SESSION STATS -->
+      <div>
+        <div style="font-family:'Space Mono',monospace;font-size:10px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px;">Ця сесія</div>
+        <div class="session-stats">
+          <div class="sess-card">
+            <div class="sess-label">Час</div>
+            <div class="sess-val" id="sess-elapsed">0<span class="unit">хв</span></div>
+          </div>
+          <div class="sess-card">
+            <div class="sess-label">Поточна фаза</div>
+            <div class="sess-val" id="sess-phase" style="font-size:13px;color:var(--text-muted);">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MASCOT -->
+      <div class="mascot-corner">
+        <img src="kael_guide.png" class="mascot-corner-img" id="mascot-img" onclick="toggleMascotBubble()" alt="Маскот">
+        <div class="mascot-corner-bubble" id="mascot-bubble">
+          Вибери тривалість і натисни «Почати» — я буду поруч! 🎸
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EXIT WARNING OVERLAY -->
+<div id="exit-warning-overlay" style="
+  position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,0.85);
+  display:none;align-items:center;justify-content:center;">
+  <div style="
+    background:var(--bg-card);border:1px solid rgba(232,93,117,0.3);
+    border-radius:24px;padding:36px;width:380px;text-align:center;
+    box-shadow:0 24px 48px rgba(0,0,0,0.6);">
+    <img src="kori_sad.png" style="width:140px;object-fit:contain;margin-bottom:16px;
+         animation:idle-float 3.5s ease-in-out infinite;
+         filter:drop-shadow(0 4px 16px rgba(232,93,117,0.15));" alt="Корі">
+    <div style="font-family:'Space Mono',monospace;font-size:18px;font-weight:700;
+                margin-bottom:8px;color:var(--text-main);">Вже йдеш? 😢</div>
+    <div style="font-size:13px;color:var(--text-muted);line-height:1.6;margin-bottom:24px;">
+      Сесія ще не завершена...<br>
+      Твій прогрес <strong style="color:var(--error)">не збережеться</strong> якщо вийдеш зараз.
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="confirmExit()" style="
+        flex:1;padding:12px;border-radius:12px;
+        background:transparent;border:1px solid rgba(232,93,117,0.4);
+        color:var(--error);font-size:13px;font-weight:600;
+        cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s;"
+        onmouseover="this.style.background='rgba(232,93,117,0.1)'"
+        onmouseout="this.style.background='transparent'">
+        Все одно вийти
+      </button>
+      <button onclick="closeExitWarning()" style="
+        flex:1;padding:12px;border-radius:12px;
+        background:var(--mint);border:none;
+        color:var(--bg-deep);font-size:13px;font-weight:700;
+        cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .2s;"
+        onmouseover="this.style.opacity='.85'"
+        onmouseout="this.style.opacity='1'">
+        Продовжити сесію 💪
+      </button>
+    </div>
+  </div>
 </div>
 
 <script>
-// ═══════════════════════════════════════
-//  ДАНІ УРОКІВ
-// ═══════════════════════════════════════
-const ALL_LESSONS = [
-  // ГІТАРА — ПОЧАТКІВЕЦЬ
-  {id:'g-b-1', inst:'guitar', lvl:'beginner', title:'Як тримати гітару і ставити руки',       time:10, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-b-2', inst:'guitar', lvl:'beginner', title:'Перший акорд — Am',                      time:12, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-b-3', inst:'guitar', lvl:'beginner', title:'Перший акорд — E мажор',                 time:12, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-b-4', inst:'guitar', lvl:'beginner', title:'Перехід Am → E — плавно і впевнено',     time:15, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-b-5', inst:'guitar', lvl:'beginner', title:'Ритмічний бій 4/4 — відчуй пульс',       time:15, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-b-6', inst:'guitar', lvl:'beginner', title:'Акорд G мажор та перехід Am → G → E',   time:18, icon:'🎸', color:'#5ee7bf'},
-  // ГІТАРА — СЕРЕДНІЙ
-  {id:'g-m-1', inst:'guitar', lvl:'middle', title:'Баре на 1 ладу — акорд F',                 time:20, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-m-2', inst:'guitar', lvl:'middle', title:'Прогресія Am → F → C → G',                time:18, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-m-3', inst:'guitar', lvl:'middle', title:'Fingerpicking — базовий паттерн',          time:20, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-m-4', inst:'guitar', lvl:'middle', title:'Техніка мьют і приглушення струн',         time:15, icon:'🎸', color:'#5ee7bf'},
-  // ГІТАРА — ВПЕВНЕНИЙ
-  {id:'g-a-1', inst:'guitar', lvl:'advanced', title:'Легато — хаммер-он та пул-оф',           time:22, icon:'🎸', color:'#5ee7bf'},
-  {id:'g-a-2', inst:'guitar', lvl:'advanced', title:'Імпровізація в пентатоніці Ля мінор',    time:25, icon:'🎸', color:'#5ee7bf'},
-  // ФОРТЕПІАНО — ПОЧАТКІВЕЦЬ
-  {id:'p-b-1', inst:'piano', lvl:'beginner', title:'Позиція рук і перші ноти',                time:12, icon:'🎹', color:'#7aa2f7'},
-  {id:'p-b-2', inst:'piano', lvl:'beginner', title:'Гама До мажор правою рукою',             time:15, icon:'🎹', color:'#7aa2f7'},
-  {id:'p-b-3', inst:'piano', lvl:'beginner', title:'Прості мелодії — «Метелик»',             time:15, icon:'🎹', color:'#7aa2f7'},
-  {id:'p-b-4', inst:'piano', lvl:'beginner', title:'Акорди лівою рукою — До, Фа, Соль',     time:18, icon:'🎹', color:'#7aa2f7'},
-  // ФОРТЕПІАНО — СЕРЕДНІЙ
-  {id:'p-m-1', inst:'piano', lvl:'middle', title:'Дві руки разом — координація',             time:20, icon:'🎹', color:'#7aa2f7'},
-  {id:'p-m-2', inst:'piano', lvl:'middle', title:'Педаль — де і коли використовувати',       time:18, icon:'🎹', color:'#7aa2f7'},
-  // УКУЛЕЛЕ — ПОЧАТКІВЕЦЬ
-  {id:'u-b-1', inst:'drums', lvl:'beginner', title:'Налаштування барабани — GCEA',          time:10, icon:'🥁', color:'#ff9e64'},
-  {id:'u-b-2', inst:'drums', lvl:'beginner', title:'Хват паличок та постановка рук',              time:12, icon:'🥁', color:'#ff9e64'},
-  {id:'u-b-3', inst:'drums', lvl:'beginner', title:'Базовий рок-ритм — перша пісня',            time:15, icon:'🥁', color:'#ff9e64'},
-  // СКРИПКА — ПОЧАТКІВЕЦЬ
-  {id:'v-b-1', inst:'violin', lvl:'beginner', title:'Постановка смичка і руки',              time:12, icon:'🎻', color:'#e0af68'},
-  {id:'v-b-2', inst:'violin', lvl:'beginner', title:'Перші ноти — відкриті струни',          time:15, icon:'🎻', color:'#e0af68'},
-  {id:'v-b-3', inst:'violin', lvl:'beginner', title:'Гама Ре мажор',                        time:18, icon:'🎻', color:'#e0af68'},
-  // ФЛЕЙТА — ПОЧАТКІВЕЦЬ
-  {id:'f-b-1', inst:'flute', lvl:'beginner', title:'Постановка амбушюра — перший звук',      time:12, icon:'🎵', color:'#bb9af7'},
-  {id:'f-b-2', inst:'flute', lvl:'beginner', title:'Ноти Сі, Ля, Соль — перший октав',      time:15, icon:'🎵', color:'#bb9af7'},
-  {id:'f-b-3', inst:'flute', lvl:'beginner', title:'Перша мелодія — «Ода до радості»',       time:18, icon:'🎵', color:'#bb9af7'},
-  // ФЛЕЙТА — СЕРЕДНІЙ
-  {id:'f-m-1', inst:'flute', lvl:'middle', title:'Вібрато на флейті — техніка',              time:20, icon:'🎵', color:'#bb9af7'},
-  {id:'f-m-2', inst:'flute', lvl:'middle', title:'Гами у другому октаві',                   time:18, icon:'🎵', color:'#bb9af7'},
-  // ВОКАЛ — ПОЧАТКІВЕЦЬ
-  {id:'vo-b-1', inst:'vocal', lvl:'beginner', title:'Дихання діафрагмою — базові вправи',   time:12, icon:'🎤', color:'#f7768e'},
-  {id:'vo-b-2', inst:'vocal', lvl:'beginner', title:'Розспівка — терції та кварти',         time:15, icon:'🎤', color:'#f7768e'},
-  {id:'vo-b-3', inst:'vocal', lvl:'beginner', title:'Резонатори — грудний і головний',      time:15, icon:'🎤', color:'#f7768e'},
-  // ВОКАЛ — СЕРЕДНІЙ
-  {id:'vo-m-1', inst:'vocal', lvl:'middle', title:'Мікрофонна техніка та дистанція',        time:18, icon:'🎤', color:'#f7768e'},
-  {id:'vo-m-2', inst:'vocal', lvl:'middle', title:'Розширення діапазону — вправи',          time:20, icon:'🎤', color:'#f7768e'},
-];
-
-const LEVEL_LABEL = { beginner:'Початківець', middle:'Середній', advanced:'Впевнений' };
-const INST_LABEL  = { guitar:'Гітара', piano:'Фортепіано', drums:'Барабани', violin:'Скрипка', flute:'Флейта', vocal:'Вокал' };
-
-// ── Стан фільтрів ──
-const filters = { inst: 'all', lvl: 'all' };
-let userInst = 'guitar';
-let completedIds = [];
-
-// ── Init ──
-window.addEventListener('load', () => {
-  const raw = localStorage.getItem('lofi_user');
-  if (!raw) { window.location.href = 'index.html'; return; }
-  const user = JSON.parse(raw);
-
-  userInst     = user.instrument || 'guitar';
-  completedIds = user.completedLessons || [];
-
-  // Аватар
-  const name = (user.name || '??').trim();
-  document.getElementById('nav-avatar').textContent =
-    name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
-
-  // Автофільтр по інструменту користувача
-  setFilter('inst', userInst,
-    document.querySelector(`[data-inst="${userInst}"]`) || document.querySelector('[data-inst="all"]')
-  );
-});
-
-// ── Фільтри ──
-function setFilter(type, value, btn) {
-  filters[type] = value;
-  // Підсвітити кнопку
-  const group = type === 'inst' ? '#inst-filters .filter-btn' : '.filter-group:nth-child(3) .filter-btn';
-  document.querySelectorAll(type === 'inst'
-    ? '[data-inst]' : '[data-lvl]'
-  ).forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
-  renderCards();
+function closeExitWarning() {
+  document.getElementById('exit-warning-overlay').style.display = 'none';
 }
-
-// ── Рендер карток ──
-function renderCards() {
-  const query  = document.getElementById('search-input').value.toLowerCase().trim();
-  const grid   = document.getElementById('lessons-grid');
-
-  let visible = ALL_LESSONS.filter(l => {
-    if (filters.inst !== 'all' && l.inst !== filters.inst) return false;
-    if (filters.lvl  !== 'all' && l.lvl  !== filters.lvl)  return false;
-    if (query && !l.title.toLowerCase().includes(query))    return false;
-    return true;
-  });
-
-  document.getElementById('lessons-count').textContent =
-    `${visible.length} ${visible.length === 1 ? 'урок' : visible.length < 5 ? 'уроки' : 'уроків'}`;
-
-  if (visible.length === 0) {
-    grid.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🎵</div>
-        <div class="empty-title">Нічого не знайдено</div>
-        <div class="empty-sub">Спробуй змінити фільтри або пошуковий запит</div>
-      </div>`;
-    return;
-  }
-
-  grid.innerHTML = visible.map((l, idx) => {
-    const done   = completedIds.includes(l.id);
-    const lvlCls = l.lvl;
-    const delay  = (idx % 9) * 0.04;
-
-    return `
-      <a href="practice.html?lesson=${l.id}" class="lesson-card${done ? ' done' : ''}"
-         style="animation-delay:${delay}s;">
-        <div class="card-thumb">
-          <div class="card-thumb-bg" style="background:${l.color};"></div>
-          <div class="card-thumb-icon">${l.icon}</div>
-          <div class="card-num">#${String(idx + 1).padStart(2,'0')}</div>
-          ${done ? '<div class="card-done-badge">✓</div>' : ''}
-        </div>
-        <div class="card-body">
-          <div class="card-inst">${l.icon} ${INST_LABEL[l.inst]}</div>
-          <div class="card-title">${l.title}</div>
-          <div class="card-meta">
-            <span class="card-pill ${lvlCls}">${LEVEL_LABEL[l.lvl]}</span>
-            <span class="card-time">⏱ ${l.time} хв</span>
-          </div>
-          ${done ? '<div class="card-progress"><div class="card-progress-fill" style="width:100%"></div></div>' : ''}
-        </div>
-      </a>`;
-  }).join('');
+function confirmExit() {
+  state.running = false;
+  clearInterval(state.intervalId);
+  window.location.href = 'home.html';
+}
+document.getElementById('exit-warning-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeExitWarning();
+});
+// Override stop button
+window.doStopTimer = function() {
+  const overlay = document.getElementById('exit-warning-overlay');
+  overlay.style.display = 'flex';
 }
 </script>
+
+<script src="practice.js"></script>
 </body>
 </html>
